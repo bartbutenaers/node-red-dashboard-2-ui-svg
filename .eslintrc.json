@@ -1,0 +1,83 @@
+{
+    "root": true,
+    "env": {
+        "es2022": true
+    },
+    "extends": [
+        "eslint:recommended", 
+        "standard",
+        "plugin:import/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2022
+    },
+    "ignorePatterns": ["dist/", "*.svg", "*.xml"],
+    "rules": {
+        // Inbuilt
+        "indent": ["error", 4],
+        "object-shorthand": ["error"],
+        "sort-imports": [
+            "error",
+            {
+                "ignoreDeclarationSort": true
+            }
+        ],
+        "no-console": ["error", { "allow": ["info", "warn", "error", "debug"] }],
+
+        // plugin:import
+        "import/order": [
+            "error",
+            {
+                "alphabetize": {
+                    "order": "asc"
+                },
+                "newlines-between": "always-and-inside-groups"
+            }
+        ],
+        "import/no-unresolved": "error"
+    },
+    "overrides": [
+        // Nodes use CommonJS and are imported by node-red into a node.js runtime
+        {   
+            "files": "nodes/**",
+            "extends": ["plugin:n/recommended"],
+            "env": {
+                "commonjs": true,
+                "browser": false
+            },
+            "rules": {
+                // plugin:n
+                "n/file-extension-in-import": "error",
+                "n/no-missing-import": "error",
+                "n/no-missing-require": "error"
+            }
+        },
+
+        // Component UI runs in the browser and builds with vite
+        {
+            "files": "ui/**",
+            "plugins": ["vue"],
+            "extends": [
+                "plugin:vue/vue3-recommended"
+            ],
+            "env": {
+                "browser": true,
+                "commonjs": false
+            },
+            "parserOptions": {
+                "sourceType": "module",
+                "ecmaVersion": 2022
+            },
+            "rules": {
+                // plugin:vue
+                "vue/html-indent": ["error", 4],
+                "vue/singleline-html-element-content-newline": "off",
+                "vue/max-attributes-per-line": "off",
+                "vue/attribute-hyphenation": "off",
+
+                // plugin:promise
+                "promise/always-return": "off" // common Vue.js pattern
+            }
+        }
+    ]
+}

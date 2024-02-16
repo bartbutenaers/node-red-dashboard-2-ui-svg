@@ -1,0 +1,78 @@
+{
+    "name": "@bartbutenaers/node-red-dashboard-2-ui-svg",
+    "version": "1.0.0",
+    "description": "A Node-RED UI node for SVG graphics in Dashboard 2.0",
+    "keywords": [
+        "node-red",
+        "node-red-dashboard-2",
+        "svg",
+        "draw",
+        "graphics"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg.git"
+    },
+    "license": "Apache-2.0",
+    "author": {
+        "name": "Bart Butenaers",
+        "url": "https://github.com/bartbutenaers"
+    },
+    "contributors": [
+    ],
+    "exports": {
+        "import": "./resources/ui-svg.esm.js",
+        "require": "./resources/ui-svg.umd.js"
+    },
+    "files": [
+        "dist/*",
+        "nodes/*",
+        "ui/*",
+        "resources/*"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "build:dev": "NODE_ENV=development vite build",
+        "dev": "NODE_ENV=development vite build --watch",
+        "dev:prod": "vite build --watch",
+        "lint": "npm run lint:js && npm run lint:package",
+        "lint:fix": "npm run lint:js:fix && npm run lint:package:fix",
+        "lint:js": "eslint --ext .js,.vue,.cjs,.mjs .",
+        "lint:js:fix": "yarn lint:js --fix",
+        "lint:package": "sort-package-json --check 'package.json'",
+        "lint:package:fix": "sort-package-json 'package.json'"
+    },
+    "dependencies": {
+        "to-title-case": "^1.0.0",
+        "vue": "^3.3.8",
+        "vuex": "^4.1.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^4.5.0",
+        "eslint": "^8.53.0",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-import": "^2.29.0",
+        "eslint-plugin-n": "^16.3.1",
+        "eslint-plugin-vue": "^9.18.1",
+        "vite": "^5.0.12",
+        "vite-plugin-css-injected-by-js": "^3.3.0"
+    },
+    "engines": {
+        "node": ">=14"
+    },
+    "node-red": {
+        "version": ">=3.0.0",
+        "nodes": {
+            "ui-example": "nodes/ui-svg.js"
+        }
+    },
+    "node-red-dashboard-2": {
+        "version": "1.0.0",
+        "widgets": {
+            "ui-svg": {
+                "output": "ui-svg.umd.js",
+                "component": "UISvg"
+            }
+        }
+    }
+}
