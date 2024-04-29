@@ -1,0 +1,161 @@
+[
+    {
+        "id": "51b14b784794954b",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add text element",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"add_element\",\"type\":\"text\",\"id\":\"my_text\",\"attributes\":{\"x\":\"250\",\"y\":\"50\"},\"style\":{\"fill\":\"red\",\"text-anchor\":\"middle\",\"dominant-baseline\":\"middle\",\"font-size\":\"30px\",\"font-style\":\"italic\",\"font-family\":\"serif\"},\"text\":\"Some SVG text for dashboard D2\"}]",
+        "payloadType": "json",
+        "x": 660,
+        "y": 1100,
+        "wires": [
+            [
+                "9a338535ec8313b6"
+            ]
+        ]
+    },
+    {
+        "id": "9a338535ec8313b6",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 850,
+        "y": 1100,
+        "wires": [
+            [
+                "1a204e0ea61e1371"
+            ]
+        ]
+    },
+    {
+        "id": "86f29f3f65dc2ff2",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Get text",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"get_text\",\"selector\":\"#my_text\"}]",
+        "payloadType": "json",
+        "x": 690,
+        "y": 1140,
+        "wires": [
+            [
+                "9a338535ec8313b6"
+            ]
+        ]
+    },
+    {
+        "id": "918b284798103b7d",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Set text",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"set_text\",\"selector\":\"#my_text\",\"text\":\"That is all folks\"}]",
+        "payloadType": "json",
+        "x": 690,
+        "y": 1180,
+        "wires": [
+            [
+                "9a338535ec8313b6"
+            ]
+        ]
+    },
+    {
+        "id": "1a204e0ea61e1371",
+        "type": "debug",
+        "z": "f624e6564f974a57",
+        "name": "Text content",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]

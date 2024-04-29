@@ -1,0 +1,211 @@
+[
+    {
+        "id": "e41ca277453a6e7d",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Remove attribute (stroke-width)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"remove_attribute\",\"selector\":\"#my_path\",\"attribute\":\"stroke-width\"}]",
+        "payloadType": "json",
+        "x": 610,
+        "y": 1480,
+        "wires": [
+            [
+                "d9f026f7d9155035"
+            ]
+        ]
+    },
+    {
+        "id": "2c3a2f34e5256882",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Replace attribute",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"replace_attribute\",\"selector\":\"#my_path\",\"attribute\":\"d\",\"regex\":\"M[^ ]+ [^ ]+ Q [^ ]+ ([^ ]+), [^ ]+ [^ ]+ T [^ ]+ [^ ]+\",\"value\":\"20\"}]",
+        "payloadType": "json",
+        "x": 660,
+        "y": 1440,
+        "wires": [
+            [
+                "d9f026f7d9155035"
+            ]
+        ]
+    },
+    {
+        "id": "5bea0d7008c99a03",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Set attribute (stroke red)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"set_attribute\",\"selector\":\"#my_path\",\"attribute\":\"stroke\",\"value\":\"red\"}]",
+        "payloadType": "json",
+        "x": 630,
+        "y": 1360,
+        "wires": [
+            [
+                "d9f026f7d9155035"
+            ]
+        ]
+    },
+    {
+        "id": "89e632221ce3ab78",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Get attribute (d)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"get_attribute\",\"selector\":\"#my_path\",\"attribute\":\"d\"}]",
+        "payloadType": "json",
+        "x": 660,
+        "y": 1400,
+        "wires": [
+            [
+                "d9f026f7d9155035"
+            ]
+        ]
+    },
+    {
+        "id": "d9f026f7d9155035",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 850,
+        "y": 1320,
+        "wires": [
+            [
+                "575d2ac32a531a56"
+            ]
+        ]
+    },
+    {
+        "id": "b7789bd0e17f6af7",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add path element",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "[{\"command\":\"add_element\",\"type\":\"path\",\"id\":\"my_path\",\"attributes\":{\"d\":\"M10 80 Q 52.5 50, 95 80 T 180 80\",\"stroke\":\"blue\",\"stroke-width\":\"3\",\"fill\":\"transparent\"}}]",
+        "payloadType": "json",
+        "x": 660,
+        "y": 1320,
+        "wires": [
+            [
+                "d9f026f7d9155035"
+            ]
+        ]
+    },
+    {
+        "id": "575d2ac32a531a56",
+        "type": "debug",
+        "z": "f624e6564f974a57",
+        "name": "Attribute value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]

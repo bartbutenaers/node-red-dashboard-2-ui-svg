@@ -1,0 +1,167 @@
+[
+    {
+        "id": "f815dab0634a6164",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Set style (fill & stroke)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"set_style\",\"selector\":\"#my_rectangle\",\"style\":{\"fill\":\"red\",\"stroke\":\"blue\"}}]",
+        "payloadType": "json",
+        "x": 640,
+        "y": 1760,
+        "wires": [
+            [
+                "339abb8f309f7277"
+            ]
+        ]
+    },
+    {
+        "id": "aa4881d9a29810b8",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "set style attribute (fill)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"set_style_attribute\",\"selector\":\"#my_rectangle\",\"attribute\":\"fill\",\"value\":\"orange\"}]",
+        "payloadType": "json",
+        "x": 640,
+        "y": 1800,
+        "wires": [
+            [
+                "339abb8f309f7277"
+            ]
+        ]
+    },
+    {
+        "id": "3294bab4bd09648f",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "remove style attribute (stroke)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"remove_style_attribute\",\"selector\":\"#my_rectangle\",\"attribute\":\"stroke\"}]",
+        "payloadType": "json",
+        "x": 620,
+        "y": 1840,
+        "wires": [
+            [
+                "339abb8f309f7277"
+            ]
+        ]
+    },
+    {
+        "id": "339abb8f309f7277",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 850,
+        "y": 1720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f1f7df7be9cb960c",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add rectangle element",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"add_element\",\"type\":\"rect\",\"id\":\"my_rectangle\",\"attributes\":{\"x\":\"150\",\"y\":\"50\",\"width\":\"150\",\"height\":\"75\",\"rx\":\"10\",\"ry\":\"10\"},\"style\":{\"fill\":\"green\"}}]",
+        "payloadType": "json",
+        "x": 640,
+        "y": 1720,
+        "wires": [
+            [
+                "339abb8f309f7277"
+            ]
+        ]
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]

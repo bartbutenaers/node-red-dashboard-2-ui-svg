@@ -11,7 +11,15 @@ const LIBRARY_NAME = 'ui-svg'
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [vue(), cssInjectedByJsPlugin()],
+    optimizeDeps: {
+        // Include the shared library in the bundle (i.e. commonjs -> esm module conversion)
+        include: ['nodes/svg_utils.js']
+    },
     build: {
+        commonjsOptions: {
+            include: [/ui/, /node_modules/],
+        },
+
         // Skip minification in dev mode
         minify: process.env.NODE_ENV !== 'development',
 
@@ -30,6 +38,9 @@ export default defineConfig({
         rollupOptions: {
             // Don't rollup the Vue dependency into the build
             external: ['vue', 'vuex'],
+//            input: {
+//                'svg_utils': resolve(__dirname, 'ui/svg_utils.js')
+//            },
             output: {
                 // Provide global variables to use in the UMD build
                 globals: {

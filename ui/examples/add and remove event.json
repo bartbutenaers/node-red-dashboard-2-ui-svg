@@ -1,0 +1,161 @@
+[
+    {
+        "id": "d62e8a5d0d05b036",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add click event",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"add_event\",\"selector\":\"#my_circle\",\"message\":{\"topic\":\"click event triggered\",\"payload\":\"circle clicked\"},\"event\":\"click\"}]",
+        "payloadType": "json",
+        "x": 660,
+        "y": 1600,
+        "wires": [
+            [
+                "c01f0f876ce4cce1"
+            ]
+        ]
+    },
+    {
+        "id": "79eff0f13f1b5847",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Remove event",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"remove_event\",\"selector\":\"#my_circle\",\"event\":\"click\"}]",
+        "payloadType": "json",
+        "x": 670,
+        "y": 1640,
+        "wires": [
+            [
+                "c01f0f876ce4cce1"
+            ]
+        ]
+    },
+    {
+        "id": "c01f0f876ce4cce1",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 850,
+        "y": 1560,
+        "wires": [
+            [
+                "8f799204c03e4e0a"
+            ]
+        ]
+    },
+    {
+        "id": "2504d90852da036f",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add circle element",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"add_element\",\"type\":\"circle\",\"id\":\"my_circle\",\"attributes\":{\"cx\":\"150\",\"cy\":\"50\",\"r\":\"40\"},\"style\":{\"fill\":\"orange\"}}]",
+        "payloadType": "json",
+        "x": 650,
+        "y": 1560,
+        "wires": [
+            [
+                "c01f0f876ce4cce1"
+            ]
+        ]
+    },
+    {
+        "id": "8f799204c03e4e0a",
+        "type": "debug",
+        "z": "f624e6564f974a57",
+        "name": "Event",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]

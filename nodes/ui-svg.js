@@ -1,6 +1,15 @@
 module.exports = function (RED) {
-    const HTMLParser = require('node-html-parser');
-    const isSvg = require('is-svg');
+    const svgUtils = require('./svg_utils.js')
+    // Optionally have a look at https://github.com/taoqf/node-html-parser
+    const { DOMParser, parseHTML } = require('linkedom')
+
+    // Load the svglint library dynamicall, since it is an ES module (instead of a CommonJs library)
+    let SVGLint
+    import('svglint').then(module => {
+        SVGLint = module.default
+    }).catch(error => {
+        console.error("Cannot import svglint dynamically:", error)
+    })
 
     function UISvgNode (config) {
         RED.nodes.createNode(this, config)
@@ -12,141 +21,145 @@ module.exports = function (RED) {
 
         const base = group.getBase()
 
-        // Create a virtual DOM, and load by default an empty svg
-        let svgString = '<svg x="0" y="0" height="100" viewBox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>'
-        node.root = HTMLParser.parse(svgString)
+        // Load an empty SVG drawing into the virtual DOM
+        let emptySvg = '<svg x="0" y="0" height="100" viewBox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>'
 
-        function executeCommand(msg, payloadItem, send, done) {
-            let parentElements, elementId
-
-            if(!payloadItem.command) {
-                node.error(`Each array item in the payload should contain a 'command' property`, msg)
-            }
-
-            switch(payloadItem.command) {
-                case 'add_element': // Add elements or replace existing elements
-                    if(!payloadItem.elementType) {
-                        node.error(`Command 'add_element' requires an 'elementType'`, msg)
-                        return
-                    }
-
-                    if(payloadItem.parentSelector) {
-                        parentElements = node.root.querySelectorAll(payloadItem.parentSelector);
-
-                        if (!parentElements || parentElements.length == 0) {
-                            node.error(`No element matches the specifed 'parentSelector' (${payloadItem.parentSelector})`, msg);
-                            return;
-                        }
-                    }
-
-                    if(payloadItem.selector.startsWith('#')) {
-                        // Remove the leading #
-                        elementId = payloadItem.selector.slice(1); 
-                    }
-
-                    if(parentElements.length > 1 && elementId) {
-                        node.error(`Cannot add element (id ${elementId}) to multiple parent elements`, msg);
-                        return;
-                    }
-                
-                    // Create a new svg element (of the specified type) to every specified parent SVG element
-                    parentElements.forEach(function(parentElement){
-                        let newElement;
-
-                        if(payloadItem.foreignElement == true) {
-                            // Foreign elements are html elements, which don't belong to the svg namespace
-                            newElement = document.createElement(payloadItem.elementType);
-                        }
-                        else {
-                            newElement = document.createElementNS("http://www.w3.org/2000/svg", payloadItem.elementType);
-                        }
-
-                        if(elementId) {
-                            newElement.setAttribute("id", elementId);
-                        }
-
-                        if(payloadItem.elementAttributes) {
-                            for (const [key, value] of Object.entries(payloadItem.elementAttributes)) {
-                                newElement.setAttribute(key, value);
-                            }
-                        }
-
-                        if(payloadItem.elementStyleAttributes) {
-                            var style = "";
-                            // Convert the Javascript object to a style formatted string
-                            for (const [key, value] of Object.entries(payloadItem.elementStyleAttributes)) {
-                                style += key;
-                                style += ":";
-                                style += value;
-                                style += "; ";
-                            }
-
-                            if(style.trim() !== "") {
-                               newElement.setAttribute("style", style);
-                            }
-                        }
-
-                        if(payloadItem.textContent) {
-                            setTextContent(newElement, payloadItem.textContent);
-                        }
-
-                        // In the "Events" tabsheet might be a CSS selector that matches this new element. This means that the 
-                        // new element might need to get event handlers automatically.  To make sure we ONLY apply those handlers 
-                        // to this new element, we add the element to a dummy parent which only has one child (i.e. this new element).
-                        //var dummyParent = document.createElement("div");
-                        //dummyParent.appendChild(newElement);
-                        //applyEventHandlers(dummyParent);
-
-                        parentElement.appendChild(newElement);
-                    })
-                    break;
-
-                case 'get_svg':
-                    // Get the svg string (which might have been modified meanwhile via input messages)
-                    // TODO dit klopt niet want wat als we verschillende commands hebben...
-                    msg.payload = node.root.toString()
-                    send(msg)
-                    break
-
-                case 'replace_svg':
-                    let payload = msg.payload
-
-                    if(!isSvg(payload)) {
-                        node.error("The payload contains no svg format", msg)
-                        return;
-                    }
-                    
-                    // The svg can be injected as string or buffer.
-                    if(Buffer.isBuffer(payload)) {
-                        payload = payload.toString() // Default UTF8
-                    }
-
-                    if(!node.root.valid(payload)) {
-                        node.error("The payload contains an invalid svg", msg)
-                        return;
-                    }
-
-                    node.root.set_content(msg.payload)
-                    break
-            }
-        }
+        // TODO use the setSvg function from the utils?
+	node.domParser = new DOMParser()
+        node.document = node.domParser.parseFromString(emptySvg, 'image/svg+xml')
+        node.svgElement = node.document.querySelector('svg')
 
         // server-side event handlers
         const evts = {
             onAction: true,
             onInput: function (msg, send, done) {
-                if(!Array.isArray(msg.payload)) {
-                    node.error("The payload contains no array")
+                if (!Array.isArray(msg.payload)) {
+                    node.error(`The payload contains no array`)
+                    return
                 }
 
-                msg.payload.forEach(function(item) {
-                    executeCommand(item, send, done)
-                }); 
+                msg.payload.forEach(payloadItem => {
+                    let msg_cloned
+
+                    try {
+                        if (!payloadItem.command) {
+                            throw new Error(`Each array item in the payload should contain a 'command' property`)
+                        }
+
+                        switch(payloadItem.command) {
+                            case 'add_element': // Add elements or replace existing elements
+                                svgUtils.addElement(node.document, node.svgElement, payloadItem)
+                                break
+                            case 'add_event':
+                                // TODO check whether a callback handler needs to be passed instead of null
+                                svgUtils.addEvent(node.svgElement, payloadItem, null)
+                                break
+                            case 'get_attribute':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getAttribute(node.svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'get_svg':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getSvg(node.svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'get_text':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getText(node.svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'get_value':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getValue(node.svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'set_svg':
+                                // Repeat the check from the svgUtils here again, because otherwise the linter could run into problems
+                                if (!payloadItem.svg) {
+                                    throw new Error(`Command '${payload.command}' requires a 'svg' field`)
+                                }
+
+                                // The svg can be injected as string or buffer.
+                                // Note: Buffer is only known on the NodeJs server side, not inside the lib in the browser
+                                if (Buffer.isBuffer(payloadItem.svg)) {
+                                    payloadItem.svg = payloadItem.svg.toString() // Default UTF8
+                                }
+
+                                SVGLint.lintSource(payloadItem.svg, {
+                                   // TODO ... config goes here
+                                }).then(linting => {
+                                    linting.on('done', () => {
+                                        if (linting.valid) {
+                                            try {
+                                                // Replace the old document (containing the old svg) by the new one
+                                                node.document = svgUtils.setSvg(node.domParser, payloadItem)
+                                                // Replace the old svg element by the new one
+                                                node.svgElement = node.document.querySelector('svg')
+                                            } catch(err) {
+                                                // Avoid Node-RED crashing due to an exception in a sub process
+                                                node.error(err)
+                                            }
+                                        }
+                                        else {
+                                           throw new Error(`Invalid svg string`)
+                                        }
+                                    })
+                                }).catch(error => {
+                                    throw new Error(`Error linting SVG: ${error}`)
+                                })
+                                break
+                            case 'remove_element':
+                                svgUtils.removeElement(node.svgElement, payloadItem)
+                                break
+                            case 'remove_event':
+                                svgUtils.removeEvent(node.svgElement, payloadItem)
+                                break
+                            case 'set_style':
+                                svgUtils.setStyle(node.svgElement, payloadItem)
+                                break
+                            case 'set_style_attribute':
+                                svgUtils.setStyleAttribute(node.svgElement, payloadItem)
+                                break
+                            case 'set_svg':
+                                svgUtils.setSvg(node.svgElement, payloadItem)
+                                break
+                            case 'set_text':
+                                svgUtils.setText(node.svgElement, payloadItem)
+                                break
+                            case 'set_value':
+                                svgUtils.setValue(node.svgElement, payloadItem)
+                                break
+                            case 'set_viewbox':
+                                svgUtils.setViewbox(node.svgElement, payloadItem)
+                                break
+                            case 'set_attribute':
+                                svgUtils.setAttribute(node.svgElement, payloadItem)
+                                break
+                            case 'remove_attribute':
+                                svgUtils.removeAttribute(node.svgElement, payloadItem)
+                                break
+                            case 'remove_style_attribute':
+                                svgUtils.removeStyleAttribute(node.svgElement, payloadItem)
+                                break
+                            case 'replace_attribute':
+                                svgUtils.replaceAttribute(node.svgElement, payloadItem)
+                                break
+                            case 'trigger_animation':
+                                svgUtils.triggerAnimation(node.svgElement, payloadItem)
+                                break
+                            default:
+                                throw new Error(`Unsupported command '${payloadItem.command}'`)
+                        }
+                    }
+                    catch(err) {
+                        node.error(err, msg)
+                    }
+                })
 
                 // store the latest value in our Node-RED datastore
                 //base.stores.data.save(node.id, msg)
                 // send it to any connected nodes in Node-RED
-                
             },
             onSocket: {
 

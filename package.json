@@ -45,7 +45,9 @@
     "dependencies": {
         "to-title-case": "^1.0.0",
         "vue": "^3.3.8",
-        "vuex": "^4.1.0"
+        "vuex": "^4.1.0",
+        "linkedom": "^0.16.11",
+        "svglint": "^2.7.1"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^4.5.0",
@@ -63,7 +65,7 @@
     "node-red": {
         "version": ">=3.0.0",
         "nodes": {
-            "ui-example": "nodes/ui-svg.js"
+            "ui-svg": "nodes/ui-svg.js"
         }
     },
     "node-red-dashboard-2": {

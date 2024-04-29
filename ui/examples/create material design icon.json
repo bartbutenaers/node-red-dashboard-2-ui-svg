@@ -1,0 +1,92 @@
+[
+    {
+        "id": "8bc37e05789d3c17",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add material design icon",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"add_element\",\"type\":\"text\",\"id\":\"my_icon\",\"attributes\":{\"x\":\"150\",\"y\":\"120\",\"fill\":\"red\"},\"style\":{\"font-family\":\"Material Design Icons\",\"font-weight\":\"bold\",\"font-size\":\"100px\"},\"text\":\"{{mdi-cctv}}\"}]",
+        "payloadType": "json",
+        "x": 630,
+        "y": 1240,
+        "wires": [
+            [
+                "2f8f8da879d5f357"
+            ]
+        ]
+    },
+    {
+        "id": "2f8f8da879d5f357",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 850,
+        "y": 1240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]

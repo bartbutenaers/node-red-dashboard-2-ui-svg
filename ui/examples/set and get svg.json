@@ -1,0 +1,136 @@
+[
+    {
+        "id": "561392479e560cc2",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Get svg",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"get_svg\"}]",
+        "payloadType": "json",
+        "x": 690,
+        "y": 940,
+        "wires": [
+            [
+                "3bbc31b92d4f0a00"
+            ]
+        ]
+    },
+    {
+        "id": "4c837381d881fbf5",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Set svg",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "[{\"command\":\"set_svg\",\"svg\":\"<circle id='my_circle' cx='250' cy='70' r='50' style='fill:red:'/><text id='my_text' x='50' y='160' style='font: italic 40px serif;'>Hello Node-RED!</text><path id='my_path' d='M10 80 Q 52.5 50, 95 80 T 180 80' stroke='blue' fill='transparent'/><foreignObject x='350' y='50' width='30' height='50'><input id='my_input' type='text' value='70' xmlns='http://www.w3.org/1999/xhtml'/></foreignObject>\"}]",
+        "payloadType": "json",
+        "x": 690,
+        "y": 900,
+        "wires": [
+            [
+                "3bbc31b92d4f0a00"
+            ]
+        ]
+    },
+    {
+        "id": "3bbc31b92d4f0a00",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 850,
+        "y": 900,
+        "wires": [
+            [
+                "aedfe4dd80a5a027"
+            ]
+        ]
+    },
+    {
+        "id": "aedfe4dd80a5a027",
+        "type": "debug",
+        "z": "f624e6564f974a57",
+        "name": "Svg",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]

@@ -1,11 +1,10 @@
 <script type="text/javascript">
     RED.nodes.registerType('ui-svg', {
-        category: RED._('@bartbutenaers/node-red-ui-svg/ui-base:ui-base.label.category'),
-        color: RED._('@bartbutenaers/node-red-ui-svg/ui-base:ui-base.colors.light'),
+        category: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.label.category'),
+        color: RED._('@flowfuse/node-red-dashboard/ui-base:ui-base.colors.light'),
         defaults: {
             name: { value: "" },
             group: { type: 'ui-group', required: true },
-            example: { value: "" },
             width: {
                 value: 0,
                 validate: function (v) {
@@ -21,9 +20,9 @@
         },
         inputs: 1,
         outputs: 1,
-        icon: "file.svg",
+        icon: "font-awesome/fa-picture-o",
         label: function() {
-            return this.name || "ui-svg";
+            return this.name || "svg";
         },
         oneditprepare: function () {
             $('#node-input-size').elementSizer({
@@ -49,9 +48,5 @@
         <input type="hidden" id="node-input-width">
         <input type="hidden" id="node-input-height">
         <button class="editor-button" id="node-input-size"></button>
-    </div>
-    <div class="form-row">
-        <label for="node-input-example"><i class="fa fa-hand"></i> Example</label>
-        <input type="text" id="node-input-example">
     </div>
 </script>
