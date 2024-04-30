@@ -4,10 +4,13 @@ A Node-RED ui node for Dashboard D2, to display a 2-way interactive drawing with
 
 ## Installation
 
-Run the following npm command in your Node-RED user directory (typically ~/.node-red):
+Since this node is in an experimental phase, it is ***not*** available on NPM yet.  So not available in the palette!
+
+Run the following npm command in your Node-RED user directory (typically ~/.node-red), to install this node directly from this Github repo:
 ```
-npm install @bartbutenaers/node-red-dashboard-2-ui-svg
+npm install bartbutenaers/node-red-dashboard-2-ui-svg
 ```
+Note that you need to have Git installed, in order to be able to execute this command.
 
 ## Support my Node-RED developments
 
