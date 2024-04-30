@@ -17,7 +17,7 @@ Please buy my wife a coffee to keep her happy, while I am busy developing Node-R
 
 ## Status of this project
 
-This repository contains an early alpha version.  It still lacks MANY features from the [old svg node], which I had developed at the time being for the old AngularJs Node-RED dashboard (which is end of life).
+This repository contains an early alpha version.  It still lacks MANY features from the [old svg node](https://github.com/bartbutenaers/node-red-contrib-ui-svg/blob/master/README.md), which I had developed at the time being for the old AngularJs Node-RED dashboard (which is end of life).
 
 This new node won't look in any way to the old svg node.  I understand that people would like to have a simple replacement for their old svg node inside the new dashboard D2.  But that won't be the case for many reasons:
 
@@ -30,7 +30,10 @@ This new node won't look in any way to the old svg node.  I understand that peop
 7.  Server-side management of animations, to avoid that new clients don't receive active animations.
 8.  Cleanup of input/output message formats, to make things (hopefully) easier to get started with.
 
-Most of this still needs to be implemented, so there is no point yet to start registering issues.  And due to the lack of free time, there is also no roadmap or ETA.  Also take into account that at this moment there will be most probably breaking changes, and no backwards compatibility will be added!
+Some remarks:
++ Most of these features still needs to be implemented, so there is ***no*** point yet to start registering issues.
++ Due to the lack of free time, there is also ***no*** roadmap or ETA.
++ Take into account that at this moment there will be most probably breaking changes, and ***no*** backwards compatibility will be provided!
 
 Of course contributions are very welcome!  Just make sure to discuss it in advance (by opening an issue), because - as explained above - the new node will ***not*** be a modern lookalike of the old node.  
 
