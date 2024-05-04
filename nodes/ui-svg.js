@@ -11,6 +11,14 @@ module.exports = function (RED) {
         console.error("Cannot import svglint dynamically:", error)
     })
 
+    // Load the diff-dom library dynamicall, since it is an ES module (instead of a CommonJs library)
+    let diffDOM
+    import('diff-dom').then(module => {
+        diffDOM = module.default
+    }).catch(error => {
+        console.error("Cannot import diff-dom dynamically:", error)
+    })
+
     function UISvgNode (config) {
         RED.nodes.createNode(this, config)
 
@@ -26,6 +34,7 @@ module.exports = function (RED) {
 
         // TODO use the setSvg function from the utils?
 	node.domParser = new DOMParser()
+
         node.document = node.domParser.parseFromString(emptySvg, 'image/svg+xml')
         node.svgElement = node.document.querySelector('svg')
 
@@ -58,6 +67,14 @@ module.exports = function (RED) {
                                 msg_cloned = RED.util.cloneMessage(msg)
                                 msg_cloned.payload = svgUtils.getAttribute(node.svgElement, payloadItem)
                                 node.send(msg_cloned)
+                                break
+                            case 'get_delta':
+                                // TODO initialize once 
+                                dd = new diffDOM.DiffDOM()
+
+
+                                nodeToObj(node.
+diff = dd.diff(elementA, elementB)
                                 break
                             case 'get_svg':
                                 msg_cloned = RED.util.cloneMessage(msg)
