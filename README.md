@@ -111,9 +111,22 @@ Elements can have a (CSS) style, which consists out of one or more style attribu
 
 # Set and get text content
 
-SVG text elements have a text content that can be get or set:
+Among others, SVG text elements have a text content that can be get or set:
 
 ![svg_text](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/0f416126-6c26-4c93-bf71-93c25e747f1e)
+
+In the above example the text content of a `text` element (with id *"my_text"*) is set like this:
+```
+"command": "set_text",
+"selector": "#my_text",
+"text": "Text content updated"
+```
+However tools like `tspan` Inkscape create SVG drawings with text elements that have a nested `tspan` element, which contain the text content.  You can set the text content of such a nested `tspan` element via the selector:
+```
+"command": "set_text",
+"selector": "#my_text > tspan",
+"text": "Tspan content updated"
+```
 
 # Add and remove events
 
