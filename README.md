@@ -50,10 +50,33 @@ All the example flows below, will be available via the Node-RED *'Import'* menu.
 
 # Set and get SVG
 
-+ *Set*: In most cases, users will create their drawing using an external SVG drawing editor software.  Once finished, the entire SVG string can be injected into this node to display it in the dashboard.
++ *Set*: In most cases, users will create their drawing using an external SVG drawing editor software.  Once finished, the entire SVG string can be injected into this node to display it in the dashboard.  The current SVG drawing will be completely removed and replaced by the new SVG drawing.
 + *Get*: It is also possible to get the SVG string from this node, send in an output message.  That SVG string will be the original injected SVG string, inclusive all manipulations executed via input messages.
 
 ![svg_set_get](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/e9007e13-4257-4a03-bc16-5c8445d9b16e)
+
+# Get delta
+
+Once a new SVG drawing is created (by adding a new SVG node to the flow or via the `set_svg` command), that drawing can be enhanced via input messages.  Which means there will be a delta between the initial SVG drawing and the current enhanced SVG drawing.  That delta can be fetched for informational purpose:
+
+![svg_get_delta](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/e95382e6-2454-4003-b5df-a06d338236bd)
+
+# Update SVG
+
+When a new SVG drawing has been set and it has been enhanced afterwards via commands in input messages, then there will be a delta between the intial drawing and the current enhanced drawing.  In some use cases it is required to update that initial drawing, but that delta needs to be applied again.
+
+![svg_update](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/1b0414b4-696c-4395-9904-61a2a9552058)
+
+Remarks:
++ The difference with the `set_svg` command is that the latter command does not take into account the available delta.
++ Typical use case:
+   1. Draw a floorplan using an external software.
+   2. Inject the floorplan SVG drawing using a `set_svg` command.
+   3. Enhance the floorplan using input messages (e.g. color a sensor red when it is in alert).
+   4. Do some changes to the floorplan using the external software.
+   5. Inject the updated floorplan using an `update_svg` command.
+   6. The updated floorplan will be displayed inclusive the sensor in red.
+ + This will only work correctly if the id's of the SVG elements are not changed!
 
 # Creating and removing elements
 
