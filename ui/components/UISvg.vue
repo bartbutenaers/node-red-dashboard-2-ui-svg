@@ -94,7 +94,7 @@ export default {
                 if (!payloadItem.command) {
                     throw new Error('Each array item in the payload should contain a "command" property')
                 }
-
+debugger
                 // TODO check if document is required as parameter
                 // TODO perhaps catch the errors and show an alert box.  Annoying user experience?  Now users need to look for errors in the console log...
                 switch(payloadItem.command) {
@@ -110,21 +110,6 @@ export default {
                     case 'add_event':
                         svgUtils.addEvent(svgElement, payloadItem, this.handleEvent)
                         break
-                    case 'get_attribute':
-                        // Don't send the value to Node-RED to avoid getting multiple output messages
-                        // svgUtils.getAttribute(svgElement, payloadItem)
-                        break
-                    case 'get_svg':
-                        svgUtils.getSvg(svgElement, payloadItem)
-                        break
-                    case 'get_text':
-                        // Don't send the text to Node-RED to avoid getting multiple output messages
-                        //svgUtils.getText(svgElement, payloadItem)
-                        break
-                    case 'get_value':
-                        // Don't send the value to Node-RED to avoid getting multiple output messages
-                        //svgUtils.getValue(svgElement, payloadItem)
-                        break
                     case 'remove_element':
                         svgUtils.removeElement(svgElement, payloadItem)
                         break
@@ -133,20 +118,6 @@ export default {
                         break
                     case 'set_style':
                         svgUtils.setStyle(svgElement, payloadItem)
-                        break
-                    case 'set_html':
-//                        let html = '<html><head></head><body><input id="my_input" value="initial"></body></html>'
-//                        let parser = new DOMParser()
-//                        let doc = parser.parseFromString(html, 'text/html')
-//                        let my_input = doc.querySelector('#my_input')
-//                        let value = my_input.value
-
-                            let html = '<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><input id="my_input" value="initial" xmlns="http://www.w3.org/1999/xhtml"></foreignObject></svg>'
-                            let parser = new DOMParser()
-                            let doc = parser.parseFromString(html, 'image/svg+xml')
-                            let my_input = doc.querySelector('#my_input')
-                            let value = my_input.value
-
                         break
                     case 'set_style_attribute':
                         svgUtils.setStyleAttribute(svgElement, payloadItem)

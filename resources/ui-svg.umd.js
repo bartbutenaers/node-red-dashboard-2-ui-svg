@@ -1,2 +1,580 @@
-(function(){"use strict";try{if(typeof document<"u"){var e=document.createElement("style");e.appendChild(document.createTextNode(".ui-svg-wrapper[data-v-d77ca936]{width:100%;height:100%;padding:10px;margin:10px;border:1px solid black}")),document.head.appendChild(e)}}catch(d){console.error("vite-plugin-css-injected-by-js",d)}})();
-(function(v,f){typeof exports=="object"&&typeof module<"u"?f(exports,require("vue"),require("vuex")):typeof define=="function"&&define.amd?define(["exports","vue","vuex"],f):(v=typeof globalThis<"u"?globalThis:v||self,f(v["ui-svg"]={},v.Vue,v.vuex))})(this,function(v,f,E){"use strict";const p=["click","dblclick","change","contextmenu","mouseover","mouseout","mouseup","mousedown","focus","focusin","focusout","blur","keyup","keydown","touchstart","touchend","change"],a={svg:"http://www.w3.org/2000/svg",html:"http://www.w3.org/1999/xhtml",xml:"http://www.w3.org/XML/1998/namespace",xlink:"http://www.w3.org/1999/xlink",xmlns:"http://www.w3.org/2000/xmlns/"};function g(n,e,t){let r=e.split(":"),s=r[0],i=r.slice(1).join(":"),l=null;(s==="xmlns"||i.length&&a[s])&&(l=a[s]),l?n.setAttributeNS(l,e,String(t)):n.setAttribute(e,String(t))}function m(n,e){let t=e.split(":"),r=t[0],s=t.slice(1).join(":"),i=null;return(r==="xmlns"||s.length&&a[r])&&(i=a[r]),i?n.getAttributeNS(i,e):n.getAttribute(e)}function x(n,e){let t=m(n,"style")||"",r={};t.split(";").forEach(function(s){let[i,l]=s.split(":");i&&l&&(r[i.trim()]=l.trim())});for(const[s,i]of Object.entries(e))r[s]=i;t="";for(const[s,i]of Object.entries(r))t+=`${s}:${i};`;g(n,"style",t)}function o(n,e){e.forEach(function(t){if(!(t in n))throw new Error(`Command '${n.command}' requires a '${t}' field`)})}function S(n,e,t){o(t,["type"]);let r=[];if(t.parentSelector&&(r=e.querySelectorAll(t.parentSelector),!r||r.length==0))throw new Error(`No element matches the specified 'parentSelector' (${t.parentSelector})`);if(r.length>1&&t.elementId)throw new Error(`Cannot add a single element (with id ${t.elementId}) to multiple parent elements`);r.length==0&&r.push(e),r.forEach(function(s){let i;if(t.foreignElement==!0?i=n.createElement(t.type):i=n.createElementNS("http://www.w3.org/2000/svg",t.type),t.id&&g(i,"id",t.id),t.attributes)for(const[l,u]of Object.entries(t.attributes))g(i,l,u);if(t.style){let l="";for(const[u,h]of Object.entries(t.style))l+=`${u}:${h};`;g(i,"style",l)}t.text&&(i.textContent=t.text),s.appendChild(i)})}function k(n,e,t){if(o(e,["selector","message","event"]),!p.includes(e.event))throw new Error("The specified 'event' is not supported");let r=n.querySelectorAll(e.selector);if(!r||!r.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let s=`data-event_${e.event}`;r.forEach(function(i){i.hasAttribute(s)||(i.addEventListener(e.event,t,!1),i.setAttribute(s,JSON.stringify({elementId:i.id,selector:e.selector,event:e.event,message:e.message})),i.style.cursor="pointer")})}function _(n,e){o(e,["selector","attribute"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let r=[];return t.forEach(function(s){r.push(m(s,e.attribute))}),r.length===1?r[0]:r}function A(n,e){return n.toString()}function $(n,e){o(e,["selector"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let r=[];return t.forEach(function(s){r.push(s.textContent)}),r.length==1?r[0]:r}function T(n,e){o(e,["selector"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let r=[];return t.forEach(function(s){s.value!==void 0&&r.push(s.value)}),r.length==1?r[0]:r}function N(n,e){o(e,["selector"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){r.remove()})}function q(n,e,t){o(e,["selector","event"]);let r=n.querySelectorAll(e.selector);if(!r||!r.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let s=`data-event_${e.event}`;r.forEach(function(i){i.hasAttribute(s)&&(i.removeEventListener(e.event,t,!1),i.removeAttribute(s),i.style.cursor="")})}function y(n,e){o(e,["selector","style"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){if(e.attribute)r.style[e.attribute]=e.style;else if(typeof e.style=="object")for(const s in e.style)r.style[s]=e.style[s];else if(e.style=="string")r.style.cssText=e.style;else throw new Error("command 'set_style' requires a string or object 'style'")})}function j(n,e){o(e,["svg"]),e.svg.trim().startsWith("<svg")||(e.svg=`<svg>${e.svg}</svg>`),/<svg[^>]*xmlns="http:\/\/www.w3.org\/2000\/svg"/.test(e.svg)||(e.svg=e.svg.replace("<svg",'<svg xmlns="http://www.w3.org/2000/svg"'));let r=n.parseFromString(e.svg,"image/svg+xml");if(r.documentElement.querySelector("parsererror")!==null)throw new Error("The 'svg' contains invalid svg");let i=r.querySelector("svg");return g(i,"width","100%"),g(i,"heigth","100%"),r}function M(n,e){o(e,["selector","text"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){r.textContent=e.text})}function C(n,e){o(e,["selector","value"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){r.value!==void 0&&(r.value=e.value)})}function O(n,e){o(e,["selector","attribute","value"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){g(r,e.attribute,e.value)})}function X(n,e){o(e,["selector","attribute","value"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let r={};r[e.attribute]=e.value,t.forEach(function(s){x(s,r)})}function Y(n,e){o(e,["selector","attribute"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){r.removeAttribute(e.attribute)})}function B(n,e){o(e,["selector","attribute"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);t.forEach(function(r){let s=m(r,"style")||"",i={};s.split(";").forEach(function(l){let[u,h]=l.split(":");u&&u!==e.attribute&&h&&(i[u.trim()]=h.trim())}),s="";for(const[l,u]of Object.entries(i))s+=`${l}:${u};`;g(r,"style",s)})}function V(n,e){o(e,["selector","attribute","regex","value"]);let t=n.querySelectorAll(e.selector);if(!t||!t.length)throw new Error(`No svg elements found for the specified 'selector' (${e.selector})`);let r=new RegExp(e.regex);t.forEach(function(s){if(s.hasAttribute(e.attribute)){let i=s.getAttribute(e.attribute);i=i.replace(r,function(l,u){return l.replace(u,e.value)}),g(s,e.attribute,i)}})}function P(n,e){}var c={addElement:S,addEvent:k,getAttribute:_,getSvg:A,getText:$,getValue:T,removeAttribute:Y,removeStyleAttribute:B,removeElement:N,removeEvent:q,replaceAttribute:V,setStyle:y,setStyleAttribute:X,setSvg:j,setText:M,setValue:C,setAttribute:O,triggerAnimation:P};const D=(n,e)=>{const t=n.__vccOpts||n;for(const[r,s]of e)t[r]=s;return t},L={name:"UISvg",inject:["$socket"],props:{id:{type:String,required:!0},props:{type:Object,default:()=>({})},state:{type:Object,default:()=>({enabled:!1,visible:!1})}},setup(n){console.info("UISvg setup with:",n),console.debug("Vue function loaded correctly",f.markRaw)},data(){return{input:{title:"some text here will base turned into title case."},vuetifyStyles:[{label:"Responsive Displays",url:"https://vuetifyjs.com/en/styles/display/#display"},{label:"Flex",url:"https://vuetifyjs.com/en/styles/flex/"},{label:"Spacing",url:"https://vuetifyjs.com/en/styles/spacing/#how-it-works"},{label:"Text & Typography",url:"https://vuetifyjs.com/en/styles/text-and-typography/#typography"}]}},computed:{titleCase(){return toTitleCase(this.input.title)},...E.mapState("data",["messages"])},mounted(){this.$socket.on("widget-load:"+this.id,n=>{this.$store.commit("data/bind",{widgetId:this.id,msg:n})}),this.$refs.svg_drawing.addEventListener("resize",n=>{let e=this.$refs.svg_drawing,t=e.getBBox(),r=[t.x,t.y,t.width,t.height].join(" ");e.setAttribute("viewBox",r)}),this.$socket.on("msg-input:"+this.id,n=>{const e=r=>{let s=this.$refs.mdi_icon_placeholder;return s.className="mdi "+r,window.getComputedStyle(s,":before").content.replaceAll('"',"")};this.$store.commit("data/bind",{widgetId:this.id,msg:n}),Array.isArray(n.payload)||node.error("The payload contains no array");let t=this.$refs.svg_drawing;n.payload.forEach(r=>{if(!r.command)throw new Error('Each array item in the payload should contain a "command" property');switch(r.command){case"add_element":r.text&&(r.text=r.text.replace(/\{\{\s*(mdi-.+?)\s*\}\}/g,function(H,z){return e(z)})),c.addElement(document,t,r);break;case"add_event":c.addEvent(t,r,this.handleEvent);break;case"get_attribute":break;case"get_svg":c.getSvg(t,r);break;case"get_text":break;case"get_value":break;case"remove_element":c.removeElement(t,r);break;case"remove_event":c.removeEvent(t,r);break;case"set_style":c.setStyle(t,r);break;case"set_html":new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><input id="my_input" value="initial" xmlns="http://www.w3.org/1999/xhtml"></foreignObject></svg>',"image/svg+xml").querySelector("#my_input").value;break;case"set_style_attribute":c.setStyleAttribute(t,r);break;case"set_svg":let h=new DOMParser,b=c.setSvg(h,r).querySelector("svg"),w=document.importNode(b,!0);t.removeAttribute("viewBox");let d=b.getAttribute("viewBox");for(d&&t.setAttribute("viewBox",d);t.firstChild;)t.removeChild(t.firstChild);for(;w.firstChild;)t.appendChild(w.firstChild);w=null;break;case"set_text":c.setText(t,r);break;case"set_value":c.setValue(t,r);break;case"set_viewbox":c.setViewbox(t,r);break;case"set_attribute":c.setAttribute(t,r);break;case"remove_attribute":c.removeAttribute(t,r);break;case"remove_style_attribute":c.removeStyleAttribute(t,r);break;case"replace_attribute":c.replaceAttribute(t,r);break;case"trigger_animation":c.triggerAnimation(t,r);break;default:throw new Error("Unknown command")}})}),this.$socket.emit("widget-load",this.id)},unmounted(){var n,e;(n=this.$socket)==null||n.off("widget-load"+this.id),(e=this.$socket)==null||e.off("msg-input:"+this.id)},methods:{send(n){this.$socket.emit("widget-action",this.id,n)},alert(n){alert(n)},handleEvent(n,e){e||(n.preventDefault(),n.stopPropagation());let t=n.currentTarget;if(!t)throw new Error(`No svg element has been found for event ${n.type}`);if(n.type=="click"&&!e&&t.hasAttribute("data-event_dblclick")){clickTimer&&clickTimerTarget!=n.target&&(clickCount=0,clearTimeout(clickTimer),clickTimerTarget=null,clickTimer=null),clickCount++;let i=n.currentTarget;clickTimer||(clickTimerTarget=n.target,clickTimer=setTimeout(function(){clickCount<2&&(Object.defineProperty(n,"currentTarget",{writable:!1,value:i}),handleEvent(n,!0)),clickCount=0,clearTimeout($scope.clickTimer),clickTimerTarget=null,clickTimer=null},400));return}let r=t.getAttribute(`data-event_${n.type}`);if(!r)throw new Error(`No user data available for this ${n.type} event`);r=JSON.parse(r);let s=r.message;if(s.event={element_id:r.elementId,type:n.type},n.type==="change")event.target.type==="number"?s.event.value=event.target.valueAsNumber:s.event.value=event.target.value;else{if(n.changedTouches){let i=n.changedTouches[0];s.event.pageX=Math.trunc(i.pageX),s.event.pageY=Math.trunc(i.pageY),s.event.screenX=Math.trunc(i.screenX),s.event.screenY=Math.trunc(i.screenY),s.event.clientX=Math.trunc(i.clientX),s.event.clientY=Math.trunc(i.clientY)}else s.event.pageX=Math.trunc(n.pageX),s.event.pageY=Math.trunc(n.pageY),s.event.screenX=Math.trunc(n.screenX),s.event.screenY=Math.trunc(n.screenY),s.event.clientX=Math.trunc(n.clientX),s.event.clientY=Math.trunc(n.clientY);if(s.event.pageX!==void 0&&s.event.pageY!==void 0){let i=t.ownerSVGElement,l=i.createSVGPoint();l.x=s.event.pageX,l.y=s.event.pageY,l=l.matrixTransform(i.getScreenCTM().inverse()),s.event.svgX=Math.trunc(l.x),s.event.svgY=Math.trunc(l.y);let u=n.target;if(!u)throw new Error(`No SVG element has been found for this ${n.type} event`);try{let h=u.getBoundingClientRect();s.event.bbox=[Math.trunc(h.left),Math.trunc(h.bottom),Math.trunc(h.right),Math.trunc(h.top)]}catch{throw new Error(`No bounding client rect has been found for this ${n.type} event`)}}}this.send(s)}}},R={className:"ui-svg-wrapper"},U={ref:"mdi_icon_placeholder"},F={ref:"svg_drawing",width:"100%",height:"100%",xmlns:"http://www.w3.org/2000/svg"};function G(n,e,t,r,s,i){return f.openBlock(),f.createElementBlock("div",R,[f.withDirectives(f.createElementVNode("i",U,null,512),[[f.vShow,!1]]),(f.openBlock(),f.createElementBlock("svg",F,null,512))])}const J=D(L,[["render",G],["__scopeId","data-v-d77ca936"]]);v.UISvg=J,Object.defineProperty(v,Symbol.toStringTag,{value:"Module"})});
+(function() {
+  "use strict";
+  try {
+    if (typeof document != "undefined") {
+      var elementStyle = document.createElement("style");
+      elementStyle.appendChild(document.createTextNode("/* CSS is auto scoped, but using named classes is still recommended */\n.ui-svg-wrapper[data-v-dfd731c1] {\n    width: 100%;\n    height: 100%;\n    padding: 10px;\n    margin: 10px;\n    border: 1px solid black;\n}"));
+      document.head.appendChild(elementStyle);
+    }
+  } catch (e) {
+    console.error("vite-plugin-css-injected-by-js", e);
+  }
+})();
+(function(global, factory) {
+  typeof exports === "object" && typeof module !== "undefined" ? factory(exports, require("vue"), require("vuex")) : typeof define === "function" && define.amd ? define(["exports", "vue", "vuex"], factory) : (global = typeof globalThis !== "undefined" ? globalThis : global || self, factory(global["ui-svg"] = {}, global.Vue, global.vuex));
+})(this, function(exports2, vue, vuex) {
+  "use strict";
+  const NAMESPACES = {
+    svg: "http://www.w3.org/2000/svg",
+    html: "http://www.w3.org/1999/xhtml",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xlink: "http://www.w3.org/1999/xlink",
+    xmlns: "http://www.w3.org/2000/xmlns/"
+    // sic for the final slash...
+  };
+  function _setAttribute(element, name, value) {
+    let parts = name.split(":");
+    let prefix = parts[0];
+    let unqualifiedName = parts.slice(1).join(":");
+    let namespace = null;
+    if (prefix === "xmlns" || unqualifiedName.length && NAMESPACES[prefix]) {
+      namespace = NAMESPACES[prefix];
+    }
+    if (namespace) {
+      element.setAttributeNS(namespace, name, String(value));
+    } else {
+      element.setAttribute(name, String(value));
+    }
+  }
+  function _getAttribute(element, name) {
+    let parts = name.split(":");
+    let prefix = parts[0];
+    let unqualifiedName = parts.slice(1).join(":");
+    let namespace = null;
+    if (prefix === "xmlns" || unqualifiedName.length && NAMESPACES[prefix]) {
+      namespace = NAMESPACES[prefix];
+    }
+    if (namespace) {
+      return element.getAttributeNS(namespace, name);
+    } else {
+      return element.getAttribute(name);
+    }
+  }
+  function _setStyleAttributes(element, attributes) {
+    let style = _getAttribute(element, "style") || "";
+    let styleObject = {};
+    style.split(";").forEach(function(styleAttribute) {
+      let [attribute, value] = styleAttribute.split(":");
+      if (attribute && value) {
+        styleObject[attribute.trim()] = value.trim();
+      }
+    });
+    for (const [key, value] of Object.entries(attributes)) {
+      styleObject[key] = value;
+    }
+    style = "";
+    for (const [key, value] of Object.entries(styleObject)) {
+      style += `${key}:${value};`;
+    }
+    _setAttribute(element, "style", style);
+  }
+  function addElement(document2, svgElement, payload) {
+    let parentElements = [];
+    if (payload.parentSelector) {
+      parentElements = svgElement.querySelectorAll(payload.parentSelector);
+      if (!parentElements || parentElements.length == 0) {
+        throw new Error(`No element matches the specified 'parentSelector' (${payload.parentSelector})`);
+      }
+    }
+    if (parentElements.length > 1 && payload.elementId) {
+      throw new Error(`Cannot add a single element (with id ${payload.elementId}) to multiple parent elements`);
+    }
+    if (parentElements.length == 0) {
+      parentElements.push(svgElement);
+    }
+    parentElements.forEach(function(parentElement) {
+      let newElement;
+      if (payload.id) {
+        if (parentElement.querySelector(`#${payload.id}`)) {
+          return;
+        }
+      }
+      if (payload.foreignElement == true) {
+        newElement = document2.createElement(payload.type);
+      } else {
+        newElement = document2.createElementNS("http://www.w3.org/2000/svg", payload.type);
+      }
+      if (payload.id) {
+        _setAttribute(newElement, "id", payload.id);
+      }
+      if (payload.attributes) {
+        for (const [key, value] of Object.entries(payload.attributes)) {
+          _setAttribute(newElement, key, value);
+        }
+      }
+      if (payload.style) {
+        let style = "";
+        for (const [key, value] of Object.entries(payload.style)) {
+          style += `${key}:${value};`;
+        }
+        _setAttribute(newElement, "style", style);
+      }
+      if (payload.text) {
+        newElement.textContent = payload.text;
+      }
+      parentElement.appendChild(newElement);
+    });
+  }
+  function addEvent(svgElement, payload, callbackHandler) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    let dataAttribute = `data-event_${payload.event}`;
+    elements.forEach(function(element) {
+      if (!element.hasAttribute(dataAttribute)) {
+        element.addEventListener(payload.event, callbackHandler, false);
+        element.setAttribute(dataAttribute, JSON.stringify({
+          elementId: element.id,
+          selector: payload.selector,
+          event: payload.event,
+          message: payload.message
+        }));
+        element.style.cursor = "pointer";
+      }
+    });
+  }
+  function removeElement(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      element.remove();
+    });
+  }
+  function removeEvent(svgElement, payload, callbackHandler) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    let dataAttribute = `data-event_${payload.event}`;
+    elements.forEach(function(element) {
+      if (element.hasAttribute(dataAttribute)) {
+        element.removeEventListener(payload.event, callbackHandler, false);
+        element.removeAttribute(dataAttribute);
+        element.style.cursor = "";
+      }
+    });
+  }
+  function setStyle(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      if (payload.attribute) {
+        element.style[payload.attribute] = payload.style;
+      } else {
+        if (typeof payload.style == "object") {
+          for (const property in payload.style) {
+            element.style[property] = payload.style[property];
+          }
+        } else if (payload.style == "string") {
+          element.style.cssText = payload.style;
+        } else {
+          throw new Error(`command 'set_style' requires a string or object 'style'`);
+        }
+      }
+    });
+  }
+  function setSvg(domParser, payload) {
+    if (!payload.svg.trim().startsWith("<svg")) {
+      payload.svg = `<svg>${payload.svg}</svg>`;
+    }
+    const xmlnsPattern = /<svg[^>]*xmlns="http:\/\/www.w3.org\/2000\/svg"/;
+    if (!xmlnsPattern.test(payload.svg)) {
+      payload.svg = payload.svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+    let document2 = domParser.parseFromString(payload.svg, "image/svg+xml");
+    let parseError = document2.documentElement.querySelector("parsererror");
+    if (parseError !== null) {
+      throw new Error(`The 'svg' contains invalid svg`);
+    }
+    let svgElement = document2.querySelector("svg");
+    _setAttribute(svgElement, "width", "100%");
+    _setAttribute(svgElement, "heigth", "100%");
+    return document2;
+  }
+  function setText(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      element.textContent = payload.text;
+    });
+  }
+  function setValue(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      if (element.value !== void 0) {
+        element.value = payload.value;
+      }
+    });
+  }
+  function setAttribute(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      _setAttribute(element, payload.attribute, payload.value);
+    });
+  }
+  function setStyleAttribute(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    let attributes = {};
+    attributes[payload.attribute] = payload.value;
+    elements.forEach(function(element) {
+      _setStyleAttributes(element, attributes);
+    });
+  }
+  function removeAttribute(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      element.removeAttribute(payload.attribute);
+    });
+  }
+  function removeStyleAttribute(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    elements.forEach(function(element) {
+      let style = _getAttribute(element, "style") || "";
+      let styleObject = {};
+      style.split(";").forEach(function(styleAttribute) {
+        let [attribute, value] = styleAttribute.split(":");
+        if (attribute && attribute !== payload.attribute && value) {
+          styleObject[attribute.trim()] = value.trim();
+        }
+      });
+      style = "";
+      for (const [key, value] of Object.entries(styleObject)) {
+        style += `${key}:${value};`;
+      }
+      _setAttribute(element, "style", style);
+    });
+  }
+  function replaceAttribute(svgElement, payload) {
+    let elements = svgElement.querySelectorAll(payload.selector);
+    if (!elements || !elements.length) {
+      throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
+    }
+    let regex = new RegExp(payload.regex);
+    elements.forEach(function(element) {
+      if (element.hasAttribute(payload.attribute)) {
+        let value = element.getAttribute(payload.attribute);
+        value = value.replace(regex, function(match, group1) {
+          return match.replace(group1, payload.value);
+        });
+        _setAttribute(element, payload.attribute, value);
+      }
+    });
+  }
+  function triggerAnimation(svgElement, payload) {
+  }
+  var svg_utils = {
+    addElement,
+    addEvent,
+    removeAttribute,
+    removeStyleAttribute,
+    removeElement,
+    removeEvent,
+    replaceAttribute,
+    setStyle,
+    setStyleAttribute,
+    setSvg,
+    setText,
+    setValue,
+    setAttribute,
+    triggerAnimation
+  };
+  const _export_sfc = (sfc, props) => {
+    const target = sfc.__vccOpts || sfc;
+    for (const [key, val] of props) {
+      target[key] = val;
+    }
+    return target;
+  };
+  const _sfc_main = {
+    name: "UISvg",
+    inject: ["$socket"],
+    props: {
+      /* do not remove entries from this - Dashboard's Layout Manager's will pass this data to your component */
+      id: { type: String, required: true },
+      props: { type: Object, default: () => ({}) },
+      state: { type: Object, default: () => ({ enabled: false, visible: false }) }
+    },
+    setup(props) {
+      console.info("UISvg setup with:", props);
+      console.debug("Vue function loaded correctly", vue.markRaw);
+    },
+    data() {
+      return {
+        input: {
+          title: "some text here will base turned into title case."
+        },
+        vuetifyStyles: [
+          { label: "Responsive Displays", url: "https://vuetifyjs.com/en/styles/display/#display" },
+          { label: "Flex", url: "https://vuetifyjs.com/en/styles/flex/" },
+          { label: "Spacing", url: "https://vuetifyjs.com/en/styles/spacing/#how-it-works" },
+          { label: "Text & Typography", url: "https://vuetifyjs.com/en/styles/text-and-typography/#typography" }
+        ]
+      };
+    },
+    computed: {
+      titleCase() {
+        return toTitleCase(this.input.title);
+      },
+      ...vuex.mapState("data", ["messages"])
+    },
+    mounted() {
+      this.$socket.on("widget-load:" + this.id, (msg) => {
+        this.$store.commit("data/bind", {
+          widgetId: this.id,
+          msg
+        });
+      });
+      this.$refs.svg_drawing.addEventListener("resize", (evt) => {
+        let svgElement = this.$refs.svg_drawing;
+        let bbox = svgElement.getBBox();
+        let viewbox = [bbox.x, bbox.y, bbox.width, bbox.height].join(" ");
+        svgElement.setAttribute("viewBox", viewbox);
+      });
+      this.$socket.on("msg-input:" + this.id, (msg) => {
+        const mdiIcon = (iconName) => {
+          let mdiIconPlaceholder = this.$refs.mdi_icon_placeholder;
+          mdiIconPlaceholder.className = "mdi " + iconName;
+          const styles = window.getComputedStyle(mdiIconPlaceholder, ":before");
+          return styles.content.replaceAll('"', "");
+        };
+        this.$store.commit("data/bind", {
+          widgetId: this.id,
+          msg
+        });
+        if (!Array.isArray(msg.payload)) {
+          node.error("The payload contains no array");
+        }
+        let svgElement = this.$refs.svg_drawing;
+        msg.payload.forEach((payloadItem) => {
+          if (!payloadItem.command) {
+            throw new Error('Each array item in the payload should contain a "command" property');
+          }
+          debugger;
+          switch (payloadItem.command) {
+            case "add_element":
+              if (payloadItem.text) {
+                payloadItem.text = payloadItem.text.replace(/\{\{\s*(mdi-.+?)\s*\}\}/g, function(match, iconName) {
+                  return mdiIcon(iconName);
+                });
+              }
+              svg_utils.addElement(document, svgElement, payloadItem);
+              break;
+            case "add_event":
+              svg_utils.addEvent(svgElement, payloadItem, this.handleEvent);
+              break;
+            case "remove_element":
+              svg_utils.removeElement(svgElement, payloadItem);
+              break;
+            case "remove_event":
+              svg_utils.removeEvent(svgElement, payloadItem);
+              break;
+            case "set_style":
+              svg_utils.setStyle(svgElement, payloadItem);
+              break;
+            case "set_style_attribute":
+              svg_utils.setStyleAttribute(svgElement, payloadItem);
+              break;
+            case "set_svg":
+              let domParser = new DOMParser();
+              let newDocument = svg_utils.setSvg(domParser, payloadItem);
+              let newSvgElement = newDocument.querySelector("svg");
+              let importedNode = document.importNode(newSvgElement, true);
+              svgElement.removeAttribute("viewBox");
+              let newViewBox = newSvgElement.getAttribute("viewBox");
+              if (newViewBox) {
+                svgElement.setAttribute("viewBox", newViewBox);
+              }
+              while (svgElement.firstChild) {
+                svgElement.removeChild(svgElement.firstChild);
+              }
+              while (importedNode.firstChild) {
+                svgElement.appendChild(importedNode.firstChild);
+              }
+              importedNode = null;
+              break;
+            case "set_text":
+              svg_utils.setText(svgElement, payloadItem);
+              break;
+            case "set_value":
+              svg_utils.setValue(svgElement, payloadItem);
+              break;
+            case "set_viewbox":
+              svg_utils.setViewbox(svgElement, payloadItem);
+              break;
+            case "set_attribute":
+              svg_utils.setAttribute(svgElement, payloadItem);
+              break;
+            case "remove_attribute":
+              svg_utils.removeAttribute(svgElement, payloadItem);
+              break;
+            case "remove_style_attribute":
+              svg_utils.removeStyleAttribute(svgElement, payloadItem);
+              break;
+            case "replace_attribute":
+              svg_utils.replaceAttribute(svgElement, payloadItem);
+              break;
+            case "trigger_animation":
+              svg_utils.triggerAnimation(svgElement, payloadItem);
+              break;
+            default:
+              throw new Error("Unknown command");
+          }
+        });
+      });
+      this.$socket.emit("widget-load", this.id);
+    },
+    unmounted() {
+      var _a, _b;
+      (_a = this.$socket) == null ? void 0 : _a.off("widget-load" + this.id);
+      (_b = this.$socket) == null ? void 0 : _b.off("msg-input:" + this.id);
+    },
+    methods: {
+      /*
+          widget-action just sends a msg to Node-RED, it does not store the msg state server-side
+          alternatively, you can use widget-change, which will also store the msg in the Node's datastore
+      */
+      send(msg) {
+        this.$socket.emit("widget-action", this.id, msg);
+      },
+      alert(text) {
+        alert(text);
+      },
+      handleEvent(evt, proceedWithoutTimer) {
+        if (!proceedWithoutTimer) {
+          evt.preventDefault();
+          evt.stopPropagation();
+        }
+        let element = evt.currentTarget;
+        if (!element) {
+          throw new Error(`No svg element has been found for event ${evt.type}`);
+        }
+        if (evt.type == "click" && !proceedWithoutTimer) {
+          if (element.hasAttribute("data-event_dblclick")) {
+            if (clickTimer && clickTimerTarget != evt.target) {
+              clickCount = 0;
+              clearTimeout(clickTimer);
+              clickTimerTarget = null;
+              clickTimer = null;
+            }
+            clickCount++;
+            let currentTarget = evt.currentTarget;
+            if (!clickTimer) {
+              clickTimerTarget = evt.target;
+              clickTimer = setTimeout(function() {
+                if (clickCount < 2) {
+                  Object.defineProperty(evt, "currentTarget", { writable: false, value: currentTarget });
+                  handleEvent(evt, true);
+                }
+                clickCount = 0;
+                clearTimeout($scope.clickTimer);
+                clickTimerTarget = null;
+                clickTimer = null;
+              }, 400);
+            }
+            return;
+          }
+        }
+        let userData = element.getAttribute(`data-event_${evt.type}`);
+        if (!userData) {
+          throw new Error(`No user data available for this ${evt.type} event`);
+        }
+        userData = JSON.parse(userData);
+        let msg = userData.message;
+        msg.event = {
+          element_id: userData.elementId,
+          type: evt.type
+        };
+        if (evt.type === "change") {
+          if (event.target.type === "number") {
+            msg.event.value = event.target.valueAsNumber;
+          } else {
+            msg.event.value = event.target.value;
+          }
+        } else {
+          if (evt.changedTouches) {
+            let touchEvent = evt.changedTouches[0];
+            msg.event.pageX = Math.trunc(touchEvent.pageX);
+            msg.event.pageY = Math.trunc(touchEvent.pageY);
+            msg.event.screenX = Math.trunc(touchEvent.screenX);
+            msg.event.screenY = Math.trunc(touchEvent.screenY);
+            msg.event.clientX = Math.trunc(touchEvent.clientX);
+            msg.event.clientY = Math.trunc(touchEvent.clientY);
+          } else {
+            msg.event.pageX = Math.trunc(evt.pageX);
+            msg.event.pageY = Math.trunc(evt.pageY);
+            msg.event.screenX = Math.trunc(evt.screenX);
+            msg.event.screenY = Math.trunc(evt.screenY);
+            msg.event.clientX = Math.trunc(evt.clientX);
+            msg.event.clientY = Math.trunc(evt.clientY);
+          }
+          if (msg.event.pageX !== void 0 && msg.event.pageY !== void 0) {
+            let rootSvgElement = element.ownerSVGElement;
+            let point = rootSvgElement.createSVGPoint();
+            point.x = msg.event.pageX;
+            point.y = msg.event.pageY;
+            point = point.matrixTransform(rootSvgElement.getScreenCTM().inverse());
+            msg.event.svgX = Math.trunc(point.x);
+            msg.event.svgY = Math.trunc(point.y);
+            let svgElement = evt.target;
+            if (!svgElement) {
+              throw new Error(`No SVG element has been found for this ${evt.type} event`);
+            }
+            try {
+              let bbox = svgElement.getBoundingClientRect();
+              msg.event.bbox = [
+                Math.trunc(bbox.left),
+                Math.trunc(bbox.bottom),
+                Math.trunc(bbox.right),
+                Math.trunc(bbox.top)
+              ];
+            } catch (err) {
+              throw new Error(`No bounding client rect has been found for this ${evt.type} event`);
+            }
+          }
+        }
+        this.send(msg);
+      }
+    }
+  };
+  const _hoisted_1 = { className: "ui-svg-wrapper" };
+  const _hoisted_2 = { ref: "mdi_icon_placeholder" };
+  const _hoisted_3 = {
+    ref: "svg_drawing",
+    width: "100%",
+    height: "100%",
+    xmlns: "http://www.w3.org/2000/svg"
+  };
+  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("div", _hoisted_1, [
+      vue.withDirectives(vue.createElementVNode("i", _hoisted_2, null, 512), [
+        [vue.vShow, false]
+      ]),
+      (vue.openBlock(), vue.createElementBlock("svg", _hoisted_3, null, 512))
+    ]);
+  }
+  const UISvg = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dfd731c1"]]);
+  exports2.UISvg = UISvg;
+  Object.defineProperty(exports2, Symbol.toStringTag, { value: "Module" });
+});

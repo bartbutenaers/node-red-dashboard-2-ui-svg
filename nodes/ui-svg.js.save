@@ -1,0 +1,264 @@
+module.exports = function (RED) {
+    const svgUtils = require('./svg_utils.js')
+    // Optionally have a look at https://github.com/taoqf/node-html-parser
+    const { DOMParser, parseHTML } = require('linkedom')
+
+    // Load the svglint library dynamicall, since it is an ES module (instead of a CommonJs library)
+    let SVGLint
+    import('svglint').then(module => {
+        SVGLint = module.default
+    }).catch(error => {
+        console.error("Cannot import svglint dynamically:", error)
+    })
+
+    // Load the diff-dom library dynamicall, since it is an ES module (instead of a CommonJs library)
+    let diffDOM
+    import('diff-dom').then(module => {
+        diffDOM = module.default
+    }).catch(error => {
+        console.error("Cannot import diff-dom dynamically:", error)
+    })
+
+    function UISvgNode (config) {
+        RED.nodes.createNode(this, config)
+
+        const node = this
+
+        // which group are we rendering this widget
+        const group = RED.nodes.getNode(config.group)
+
+        const base = group.getBase()
+
+        // Load the last displayed svg, when the context store has been persisted
+        let lastDisplayedSvg = node.context().get('displayed-svg', config.contextStore)
+        if (!lastDisplayedSvg) {
+            // Display the last received svg
+            lastDisplayedSvg = '<svg x="0" y="0" height="100" viewBox="0 0 100 100" width="100" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3>
+        }
+
+        // TODO use the setSvg function from the utils?
+	node.domParser = new DOMParser()
+        let lastDisplayedDocument = node.domParser.parseFromString(lastDisplayedSvg, 'image/svg+xml')
+        applySvg(lastDisplayedDocument)
+
+        async function validateSvg(svg) {
+            const config = {}
+            const linting = await SVGLint.lintSource(svg, config);
+            linting.on('done', () => {
+                if (linting.state !== linting.STATES.success) {
+                    throw new Error(`Invalid svg string`)
+                }
+            })
+        }
+
+        function applySvg(document) {
+            // Replace the old document by the new one
+            node.displayedDocument = document
+
+            let svg =  node.displayedDocument.querySelector('svg').toString()
+
+            // TODO same code as above so create function
+            node.context().set('last-received-svg', svg, config.contextStore)
+            node.context().set('displayed-svg', svg, config.contextStore)
+        }
+
+        function calculateDelta() {
+            let lastReceivedSvg = node.context().get('displayed-svg', config.contextStore)
+
+            // TODO same code as above, so creat function
+            // Convert the last received svg string to an object for comparision
+            let lastReceivedSvgObj = diffDOM.stringToObj(lastReceivedSvg)
+
+            // Convert the displayed svg document to an object for comparison
+            let displayedSvgObj = diffDOM.nodeToObj(node.displayedDocument.querySelector('svg'))
+
+            // TODO initialize once
+            let dd = new diffDOM.DiffDOM({
+            // Unlike a browser, in a NodeJs environment there is no document available.
+            // Therefore pass the LinkeDom document, to avoid that DiffDom returns following
+            // error (when applying a delta to an svg element):
+            // "TypeError: options.document.createElement is not a function"
+                document: newDocument
+            })
+
+            let delta = dd.diff(lastReceivedSvgObj, displayedSvgObj)
+
+            return delta
+        }
+
+        // server-side event handlers
+        const evts = {
+            onAction: true,
+            onInput: async function (msg, send, done) {
+                if (!Array.isArray(msg.payload)) {
+                    node.error(`The payload contains no array`)
+                    return
+                }
+
+                for (let payloadItem of msg.payload) {
+                    let msg_cloned
+
+                    try {
+                        if (!payloadItem.command) {
+                            throw new Error(`Each array item in the payload should contain a 'command' property`)
+                        }
+
+                        let svgElement = node.displayedDocument.querySelector('svg')
+
+                        switch(payloadItem.command) {
+                            case 'add_element': // Add elements or replace existing elements
+                                svgUtils.addElement(node.displayedDocument, svgElement, payloadItem)
+                                break
+                            case 'add_event':
+                                // TODO check whether a callback handler needs to be passed instead of null
+                                svgUtils.addEvent(svgElement, payloadItem, null)
+                                break
+                            case 'get_attribute':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getAttribute(svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'get_delta':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = calculateDelta()
+                                node.send(msg_cloned)
+                                break
+                            case 'get_svg':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getSvg(svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'get_text':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getText(svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'get_value':
+                                msg_cloned = RED.util.cloneMessage(msg)
+                                msg_cloned.payload = svgUtils.getValue(svgElement, payloadItem)
+                                node.send(msg_cloned)
+                                break
+                            case 'set_svg':
+                                // Repeat the check from the svgUtils here again, because otherwise the linter could run into problems
+                                if (!payloadItem.svg) {
+                                    throw new Error(`Command '${payload.command}' requires a 'svg' field`)
+                                }
+
+                                // The svg can be injected as string or buffer.
+                                // Note: Buffer is only known on the NodeJs server side, not inside the lib in the browser
+                                if (Buffer.isBuffer(payloadItem.svg)) {
+                                    payloadItem.svg = payloadItem.svg.toString() // Default UTF8
+                                }
+
+                                // Throws exception if invalid svg
+                                validateSvg(payloadItem.svg)
+tot hier
+                                // Replace the old document (containing the old svg) by the new one
+                                node.displayedDocument = svgUtils.setSvg(node.domParser, payloadItem)
+
+                                // Store the last received svg (without delta applied)
+                                node.lastReceivedSvg = payloadItem.svg
+
+                                // TODO same code as above so create function
+                                node.context().set('last-received-svg', node.lastReceivedSvg, config.contextStore)
+                                node.context().set('displayed-svg', node.displayedSvg, config.contextStore)
+                                break
+                            case 'remove_element':
+                                svgUtils.removeElement( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'remove_event':
+                                svgUtils.removeEvent( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_style':
+                                svgUtils.setStyle( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_style_attribute':
+                                svgUtils.setStyleAttribute( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_svg':
+                                svgUtils.setSvg( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_text':
+                                svgUtils.setText( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_value':
+                                svgUtils.setValue( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_viewbox':
+                                svgUtils.setViewbox( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'set_attribute':
+                                svgUtils.setAttribute( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'remove_attribute':
+                                svgUtils.removeAttribute( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'remove_style_attribute':
+                                svgUtils.removeStyleAttribute( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'replace_attribute':
+                                svgUtils.replaceAttribute( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'trigger_animation':
+                                svgUtils.triggerAnimation( node.displayedDocument.querySelector('svg'), payloadItem)
+                                break
+                            case 'update_svg':
+                                // Repeat the check from the svgUtils here again, because otherwise the linter could run into problems
+                                if (!payloadItem.svg) {
+                                    throw new Error(`Command '${payload.command}' requires a 'svg' field`)
+                                }
+
+                                // The svg can be injected as string or buffer.
+                                // Note: Buffer is only known on the NodeJs server side, not inside the lib in the browser
+                                if (Buffer.isBuffer(payloadItem.svg)) {
+                                    payloadItem.svg = payloadItem.svg.toString() // Default UTF8
+                                }
+
+                                // Throws exception if invalid svg
+                                validateSvg(payloadItem.svg)
+
+                                // Create a new document from the injected svg string
+                                let newDocument = svgUtils.setSvg(node.domParser, payloadItem)
+
+                                let delta = calculateDelta()
+
+                                let newSvgElement = newDocument.querySelector('svg')
+
+                                // Apply the delta to the new svg element
+                                dd.apply(newSvgElement, delta)
+
+                                // The newDocument now contains the delta (inside the svg element)
+                                applySvg(newDocument)
+
+                                // Make sure the frontend also receives the updated svg string
+                                payloadItem.svg = node.lastReceivedSvg
+                                break
+
+                            default:
+                                throw new Error(`Unsupported command '${payloadItem.command}'`)
+                        }
+                    }
+                    catch(err) {
+                        node.error(err, msg)
+                    }
+                }
+
+                // store the latest value in our Node-RED datastore
+                //base.stores.data.save(node.id, msg)
+                // send it to any connected nodes in Node-RED
+            },
+            onSocket: {
+
+            }
+        }
+
+        // inform the dashboard UI that we are adding this node
+        if (group) {
+            group.register(node, config, evts)
+        } else {
+            node.error('No group configured')
+        }
+    }
+
+    RED.nodes.registerType('ui-svg', UISvgNode)
+}

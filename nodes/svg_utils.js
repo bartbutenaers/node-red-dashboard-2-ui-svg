@@ -33,25 +33,9 @@ function _setAttribute(element, name, value) {
     }
 }
 
-// Determine - based on the attribute name - whether a namespaced value should be get or not.
-function _getAttribute(element, name) {
-    let parts = name.split(':')
-    let prefix = parts[0]
-    let unqualifiedName = parts.slice(1).join(':')
-    let namespace = null
-    if (prefix === 'xmlns' || unqualifiedName.length && NAMESPACES[prefix]) {
-        namespace = NAMESPACES[prefix]
-    }
-    if (namespace) {
-        return element.getAttributeNS(namespace, name)
-    } else {
-        return element.getAttribute(name)
-    }
-}
-
 function _setStyleAttributes(element, attributes) {
     // Get the existing style string (if available)
-    let style = _getAttribute(element, 'style') || ''
+    let style = getAttribute(element, 'style') || ''
 
     // Convert the (; separated) style string to an object
     let styleObject = {};
@@ -76,12 +60,14 @@ function _setStyleAttributes(element, attributes) {
     _setAttribute(element, 'style', style)
 }
 
-function _checkRequiredFields(payload, fields) {
-    fields.forEach(function(field) {
-        if (!(field in payload)) {
-            throw new Error(`Command '${payload.command}' requires a '${field}' field`)
-        }
-    })
+function _setText(element, text) {
+    // Go down recursively to the deepest level of the (optional) child tree, and set the text on the deepest element
+    if (element.childNodes.length > 0) {
+        setText(element.childNodes[0], text)
+    }
+    else {
+        element.textContent = text
+    }
 }
 
 // ===================================================================================================
@@ -90,8 +76,6 @@ function _checkRequiredFields(payload, fields) {
 
 // Add elements, or replace them if they already exist
 function addElement(document, svgElement, payload) {
-    _checkRequiredFields(payload, ['type'])
-
     let parentElements = []
     if (payload.parentSelector) {
         parentElements = svgElement.querySelectorAll(payload.parentSelector);
@@ -113,6 +97,16 @@ function addElement(document, svgElement, payload) {
     // Create a new svg element (of the specified type) to every specified parent SVG element
     parentElements.forEach(function(parentElement){
         let newElement
+
+        // If there is already an element with the same id for this parent, then don't add it twice
+        // TODO : show warning to simplify user troubleshooting
+        // TODO : what if same id already exists for another parent?  Because id's should be unique across a page.
+        //        You won't get an error when creating a new element with the same id, but it will result in unexpected behaviour.
+        if (payload.id) {
+            if (parentElement.querySelector(`#${payload.id}`)) {
+                return // Go to next iteration
+            }
+        }
 
         if (payload.foreignElement == true) {
             // Foreign elements are html elements, which don't belong to the svg namespace
@@ -160,14 +154,6 @@ function addElement(document, svgElement, payload) {
 }
 
 function addEvent(svgElement, payload, callbackHandler) {
-    // TODO: if js events are imported, we could introduce a 'javascript' property which contains
-    // the code to be executed in the handleEvent.
-    _checkRequiredFields(payload, ['selector', 'message', 'event'])
-
-    if (!ALLOWED_EVENTS.includes(payload.event)) {
-        throw new Error(`The specified 'event' is not supported`)
-    }
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -192,94 +178,23 @@ function addEvent(svgElement, payload, callbackHandler) {
     })
 }
 
-function getAttribute(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'attribute'])
-
-    let elements = svgElement.querySelectorAll(payload.selector)
-    if (!elements || !elements.length) {
-        throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
+// Determine - based on the attribute name - whether a namespaced value should be get or not.
+function getAttribute(element, name) {
+    let parts = name.split(':')
+    let prefix = parts[0]
+    let unqualifiedName = parts.slice(1).join(':')
+    let namespace = null
+    if (prefix === 'xmlns' || unqualifiedName.length && NAMESPACES[prefix]) {
+        namespace = NAMESPACES[prefix]
     }
-
-    let values = []
-    elements.forEach(function(element){
-        values.push(_getAttribute(element, payload.attribute))
-    })
-
-    if (values.length === 1) {
-        return values[0]
-    }
-    else {
-        return values
-    }
-}
-
-// Note: this function is only required in the server side
-function getSvg(svgElement, payload) {
-    // Get the svg string (which might have been modified meanwhile via input messages)
-    // TODO dit klopt niet want wat als we verschillende commands hebben...
-    return svgElement.toString()
-}
-
-// Note: this function is only required in the server side
-// Returns the text content for every element that matches the selector.
-// For each of those elements it will return a string, containing the (comma separated) text contents
-// of all child elements.  For example:
-//      <svg id="mySvg" xmlns="http://www.w3.org/2000/svg" width="500" height="500">
-//          <text x="10" y="50">Hello,</text>
-//          <text x="70" y="50">World!</text>
-//     </svg>
-// The text content of element 'mySvg' will be 'Hello,World!'.
-// In contradiction to the inner html, the text content will not contain the tags of the child elements.
-function getText(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector'])
-
-    let elements = svgElement.querySelectorAll(payload.selector)
-    if (!elements || !elements.length) {
-        throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
-    }
-
-    let textContents = []
-    elements.forEach(function(element){
-        textContents.push(element.textContent)
-    })
-
-    if (textContents.length == 1) {
-        return textContents[0]
-    }
-    else {
-        return textContents
-    }
-}
-
-// Get the value from a foreign (i.e. non-svg) html element.
-// A value is available for the following html element types: input, textarea, select, option, button, output
-function getValue(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector'])
-
-    let elements = svgElement.querySelectorAll(payload.selector)
-    if (!elements || !elements.length) {
-        throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
-    }
-
-    let values = []
-    elements.forEach(function(element) {
-        // Only set the value for html element types which have a value
-        if (element.value !== undefined) {
-            values.push(element.value)
-        }
-    })
-
-    if (values.length == 1) {
-        return values[0]
-    }
-    else {
-        return values
+    if (namespace) {
+        return element.getAttributeNS(namespace, name)
+    } else {
+        return element.getAttribute(name)
     }
 }
 
 function removeElement(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -291,8 +206,6 @@ function removeElement(svgElement, payload) {
 }
 
 function removeEvent(svgElement, payload, callbackHandler) {
-    _checkRequiredFields(payload, ['selector', 'event'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -314,8 +227,6 @@ function removeEvent(svgElement, payload, callbackHandler) {
 }
 
 function setStyle(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'style'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -341,8 +252,6 @@ function setStyle(svgElement, payload) {
 }
 
 function setSvg(domParser, payload) {
-    _checkRequiredFields(payload, ['svg'])
-
     // Make sure there is an svg root element, because the dom parser below won't add it automatically
     if (!payload.svg.trim().startsWith('<svg')) {
         payload.svg = `<svg>${payload.svg}</svg>`
@@ -379,8 +288,6 @@ function setSvg(domParser, payload) {
 }
 
 function setText(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'text'])
-
 // TODO in de oude node stond code om de unicode van een fontawesome icoon op te halen
 // Misschien best met de nieuwe iconen werken!!!!!!!!!!!!!!!!!
 // Wel niet zeker hoe we dat op de server side moeten doen, want daar bestaan die icons niet
@@ -397,8 +304,6 @@ function setText(svgElement, payload) {
 // Set the value of a foreign (i.e. non-svg) html element.
 // A value is available for the following html element types: input, textarea, select, option, button, output
 function setValue(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'value'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -413,13 +318,10 @@ function setValue(svgElement, payload) {
 }
 
 function setViewBox(svgElement, payload) {
-    _checkRequiredFields(payload, ['viewbox'])
     _setAttribute(svgElement, 'viewbox', payload.viewbox)
 }
 
 function setAttribute(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'attribute', 'value'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -431,8 +333,6 @@ function setAttribute(svgElement, payload) {
 }
 
 function setStyleAttribute(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'attribute', 'value'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -448,8 +348,6 @@ function setStyleAttribute(svgElement, payload) {
 }
 
 function removeAttribute(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'attribute'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -461,8 +359,6 @@ function removeAttribute(svgElement, payload) {
 }
 
 function removeStyleAttribute(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'attribute'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -470,7 +366,7 @@ function removeStyleAttribute(svgElement, payload) {
 
     elements.forEach(function(element){
         // Get the existing style string (if available)
-        let style = _getAttribute(element, 'style') || ''
+        let style = getAttribute(element, 'style') || ''
 
         // Convert the (; separated) style string to an object
         let styleObject = {};
@@ -493,8 +389,6 @@ function removeStyleAttribute(svgElement, payload) {
 }
 
 function replaceAttribute(svgElement, payload) {
-    _checkRequiredFields(payload, ['selector', 'attribute', 'regex', 'value'])
-
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
@@ -524,9 +418,6 @@ module.exports = {
     addElement,
     addEvent,
     getAttribute,
-    getSvg,
-    getText,
-    getValue,
     removeAttribute,
     removeStyleAttribute,
     removeElement,
