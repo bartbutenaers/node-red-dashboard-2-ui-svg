@@ -121,7 +121,7 @@ In the above example the text content of a `text` element (with id *"my_text"*) 
 "selector": "#my_text",
 "text": "Text content updated"
 ```
-However tools like `tspan` Inkscape create SVG drawings with text elements that have a nested `tspan` element, which contain the text content.  You can set the text content of such a nested `tspan` element via the selector:
+However tools like e.g. Inkscape create SVG drawings with text elements that have a nested `tspan` element, which contain the text content.  You can set the text content of such a nested `tspan` element via the selector:
 ```
 "command": "set_text",
 "selector": "#my_text > tspan",
