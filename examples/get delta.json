@@ -1,0 +1,137 @@
+[
+    {
+        "id": "af108a3ac5a410e1",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Add circle element",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"add_element\",\"type\":\"circle\",\"id\":\"second_circle\",\"attributes\":{\"cx\":\"150\",\"cy\":\"50\",\"r\":\"40\"},\"style\":{\"fill\":\"orange\"}}]",
+        "payloadType": "json",
+        "x": 1270,
+        "y": 100,
+        "wires": [
+            [
+                "2326f4ec71399368"
+            ]
+        ]
+    },
+    {
+        "id": "b27264fe21179351",
+        "type": "inject",
+        "z": "f624e6564f974a57",
+        "name": "Get delta",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"command\":\"get_delta\"}]",
+        "payloadType": "json",
+        "x": 1300,
+        "y": 140,
+        "wires": [
+            [
+                "2326f4ec71399368"
+            ]
+        ]
+    },
+    {
+        "id": "2326f4ec71399368",
+        "type": "ui-svg",
+        "z": "f624e6564f974a57",
+        "d": true,
+        "name": "",
+        "group": "65805ec358e05ea4",
+        "width": 0,
+        "height": 0,
+        "x": 1470,
+        "y": 100,
+        "wires": [
+            [
+                "02df1ea90efeefd5"
+            ]
+        ]
+    },
+    {
+        "id": "02df1ea90efeefd5",
+        "type": "debug",
+        "z": "f624e6564f974a57",
+        "name": "Delta",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1610,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "65805ec358e05ea4",
+        "type": "ui-group",
+        "name": "SVG demos",
+        "page": "0a90f52e8742b298",
+        "width": "10",
+        "height": "10",
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "0a90f52e8742b298",
+        "type": "ui-page",
+        "name": "SVG",
+        "ui": "be29745a6e568f30",
+        "path": "/page2",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "092547d34959327c",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "be29745a6e568f30",
+        "type": "ui-base",
+        "name": "UI Name",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "092547d34959327c",
+        "type": "ui-theme",
+        "name": "Theme Name",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        }
+    }
+]
