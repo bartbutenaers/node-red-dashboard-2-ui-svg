@@ -3,6 +3,8 @@ module.exports = function (RED) {
     // Optionally have a look at https://github.com/taoqf/node-html-parser
     const { DOMParser, parseHTML } = require('linkedom')
 
+    const ALLOWED_EVENTS = ["click", "dblclick", "change", "contextmenu", "mouseover", "mouseout", "mouseup", "mousedown", "focus", "focusin", "focusout", "blur", "keyup", "keydown", "touchstart", "touchend", "change"]
+
     // Load the svglint library dynamicall, since it is an ES module (instead of a CommonJs library)
     let SVGLint
     import('svglint').then(module => {

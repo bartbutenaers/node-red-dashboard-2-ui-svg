@@ -1,4 +1,3 @@
-const ALLOWED_EVENTS = ["click", "dblclick", "change", "contextmenu", "mouseover", "mouseout", "mouseup", "mousedown", "focus", "focusin", "focusout", "blur", "keyup", "keydown", "touchstart", "touchend", "change"]
 const NAMESPACES = {
   svg: 'http://www.w3.org/2000/svg',
   html: 'http://www.w3.org/1999/xhtml',
