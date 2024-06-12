@@ -190,7 +190,7 @@ debugger
     },
     unmounted () {
         /* Make sure, any events you subscribe to on SocketIO are unsubscribed to here */
-        this.$socket?.off('widget-load' + this.id)
+        this.$socket?.off('widget-load:' + this.id)
         this.$socket?.off('msg-input:' + this.id)
     },
     methods: {
