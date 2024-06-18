@@ -314,3 +314,55 @@ Apply events (e.g. click) to elements, to trigger actions (e.g. send output mess
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/add%20and%20remove%20event.json):
 
 ![svg_events](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/d88ae48c-d260-409d-ae38-f00d642564fe)
+
+# Add, remove, start and stop animations
+
+Animations can be used to change SVG elements (e.g. attribute values) over time from one value to another.
+
+TODO: not possible to add an animation element with a specified id to multiple svg elements.
+
++ *Add* an animation, as a child element of the SVG element that needs to be animated.  An animation can be created like any other SVG element:
+   ```
+   "payload": {
+      "command": "add_element",
+      "type": "animate",
+      "id": "my_animation",
+      "parentSelector": "#my_circle",
+      "attributes": {
+         "attributeName": "r",
+         "from": "40",
+         "to": "10",
+         "dur": "3s",
+         "repeatCount": "indefinite"
+      }
+   }
+   ```
+
++ *Remove* an animation.
+   ```
+   "payload": {
+      "command": "remove_element",
+      "selector": "#my_animation",
+   }
+   ```
+
++ *Start* an animation.
+   ```
+   "payload": {
+      "command": "start_animation",
+      "selector": "#my_animation",
+   }
+   ```
+
++ *Stop* an animation.
+   ```
+   "payload": {
+      "command": "stop_animation",
+      "selector": "#my_animation",
+   }
+   ```
+
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/animations.json):
+
+![svg_animations](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/d6e15dd6-d86f-4f53-8a1f-84220fc6a4a6)
+
