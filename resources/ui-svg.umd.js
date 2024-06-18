@@ -3,7 +3,7 @@
   try {
     if (typeof document != "undefined") {
       var elementStyle = document.createElement("style");
-      elementStyle.appendChild(document.createTextNode("/* CSS is auto scoped, but using named classes is still recommended */\n.ui-svg-wrapper[data-v-dfd731c1] {\n    width: 100%;\n    height: 100%;\n    padding: 10px;\n    margin: 10px;\n    border: 1px solid black;\n}"));
+      elementStyle.appendChild(document.createTextNode("/* CSS is auto scoped, but using named classes is still recommended */\n.ui-svg-wrapper[data-v-77141c44] {\n    width: 100%;\n    height: 100%;\n    padding: 10px;\n    margin: 10px;\n    border: 1px solid black;\n}"));
       document.head.appendChild(elementStyle);
     }
   } catch (e) {
@@ -36,22 +36,8 @@
       element.setAttribute(name, String(value));
     }
   }
-  function _getAttribute(element, name) {
-    let parts = name.split(":");
-    let prefix = parts[0];
-    let unqualifiedName = parts.slice(1).join(":");
-    let namespace = null;
-    if (prefix === "xmlns" || unqualifiedName.length && NAMESPACES[prefix]) {
-      namespace = NAMESPACES[prefix];
-    }
-    if (namespace) {
-      return element.getAttributeNS(namespace, name);
-    } else {
-      return element.getAttribute(name);
-    }
-  }
   function _setStyleAttributes(element, attributes) {
-    let style = _getAttribute(element, "style") || "";
+    let style = getAttribute(element, "style") || "";
     let styleObject = {};
     style.split(";").forEach(function(styleAttribute) {
       let [attribute, value] = styleAttribute.split(":");
@@ -133,6 +119,20 @@
         element.style.cursor = "pointer";
       }
     });
+  }
+  function getAttribute(element, name) {
+    let parts = name.split(":");
+    let prefix = parts[0];
+    let unqualifiedName = parts.slice(1).join(":");
+    let namespace = null;
+    if (prefix === "xmlns" || unqualifiedName.length && NAMESPACES[prefix]) {
+      namespace = NAMESPACES[prefix];
+    }
+    if (namespace) {
+      return element.getAttributeNS(namespace, name);
+    } else {
+      return element.getAttribute(name);
+    }
   }
   function removeElement(svgElement, payload) {
     let elements = svgElement.querySelectorAll(payload.selector);
@@ -251,7 +251,7 @@
       throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`);
     }
     elements.forEach(function(element) {
-      let style = _getAttribute(element, "style") || "";
+      let style = getAttribute(element, "style") || "";
       let styleObject = {};
       style.split(";").forEach(function(styleAttribute) {
         let [attribute, value] = styleAttribute.split(":");
@@ -287,6 +287,7 @@
   var svg_utils = {
     addElement,
     addEvent,
+    getAttribute,
     removeAttribute,
     removeStyleAttribute,
     removeElement,
@@ -353,6 +354,7 @@
         svgElement.setAttribute("viewBox", viewbox);
       });
       this.$socket.on("msg-input:" + this.id, (msg) => {
+        let animationElements;
         const mdiIcon = (iconName) => {
           let mdiIconPlaceholder = this.$refs.mdi_icon_placeholder;
           mdiIconPlaceholder.className = "mdi " + iconName;
@@ -426,6 +428,24 @@
             case "set_attribute":
               svg_utils.setAttribute(svgElement, payloadItem);
               break;
+            case "start_animation":
+              animationElements = svgElement.querySelectorAll(payloadItem.selector);
+              if (!animationElements || !animationElements.length) {
+                throw new Error(`No animation elements found for the specified 'selector' (${payloadItem.selector})`);
+              }
+              animationElements.forEach(function(animationElement) {
+                animationElement.beginElement();
+              });
+              break;
+            case "stop_animation":
+              animationElements = svgElement.querySelectorAll(payloadItem.selector);
+              if (!animationElements || !animationElements.length) {
+                throw new Error(`No animation elements found for the specified 'selector' (${payloadItem.selector})`);
+              }
+              animationElements.forEach(function(animationElement) {
+                animationElement.endElement();
+              });
+              break;
             case "remove_attribute":
               svg_utils.removeAttribute(svgElement, payloadItem);
               break;
@@ -447,7 +467,7 @@
     },
     unmounted() {
       var _a, _b;
-      (_a = this.$socket) == null ? void 0 : _a.off("widget-load" + this.id);
+      (_a = this.$socket) == null ? void 0 : _a.off("widget-load:" + this.id);
       (_b = this.$socket) == null ? void 0 : _b.off("msg-input:" + this.id);
     },
     methods: {
@@ -574,7 +594,7 @@
       (vue.openBlock(), vue.createElementBlock("svg", _hoisted_3, null, 512))
     ]);
   }
-  const UISvg = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-dfd731c1"]]);
+  const UISvg = /* @__PURE__ */ _export_sfc(_sfc_main, [["render", _sfc_render], ["__scopeId", "data-v-77141c44"]]);
   exports2.UISvg = UISvg;
   Object.defineProperty(exports2, Symbol.toStringTag, { value: "Module" });
 });

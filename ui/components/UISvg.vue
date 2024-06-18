@@ -69,6 +69,8 @@ export default {
         })
 
         this.$socket.on('msg-input:' + this.id, (msg) => {
+            let animationElements
+
             const mdiIcon = (iconName) => {
                 let mdiIconPlaceholder = this.$refs.mdi_icon_placeholder
                 mdiIconPlaceholder.className = 'mdi ' + iconName
@@ -166,6 +168,26 @@ debugger
                         break
                     case 'set_attribute':
                         svgUtils.setAttribute(svgElement, payloadItem)
+                        break
+                    case 'start_animation':
+                        animationElements = svgElement.querySelectorAll(payloadItem.selector)
+                        if (!animationElements || !animationElements.length) {
+                            throw new Error(`No animation elements found for the specified 'selector' (${payloadItem.selector})`)
+                        }
+
+                        animationElements.forEach(function(animationElement){
+                            animationElement.beginElement()
+                        })
+                        break
+                    case 'stop_animation':
+                        animationElements = svgElement.querySelectorAll(payloadItem.selector)
+                        if (!animationElements || !animationElements.length) {
+                            throw new Error(`No animation elements found for the specified 'selector' (${payloadItem.selector})`)
+                        }
+
+                        animationElements.forEach(function(animationElement){
+                            animationElement.endElement()
+                        })
                         break
                     case 'remove_attribute':
                         svgUtils.removeAttribute(svgElement, payloadItem)

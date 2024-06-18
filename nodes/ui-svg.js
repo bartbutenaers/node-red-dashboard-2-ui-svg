@@ -309,6 +309,12 @@ module.exports = function (RED) {
                                 checkRequiredFields(payloadItem, ['selector', 'attribute', 'value'])
                                 svgUtils.setAttribute(svgElement, payloadItem)
                                 break
+                            case 'start_animation':
+                                 // This only needs to be done on the frontend side
+                                break
+                            case 'stop_animation':
+                                 // This only needs to be done on the frontend side
+                                break
                             case 'remove_attribute':
                                 checkRequiredFields(payloadItem, ['selector', 'attribute'])
                                 svgUtils.removeAttribute(svgElement, payloadItem)
