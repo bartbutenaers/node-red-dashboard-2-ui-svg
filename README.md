@@ -51,7 +51,19 @@ All the example flows below, will be available via the Node-RED *'Import'* menu.
 # Set and get SVG
 
 + *Set*: In most cases, users will create their drawing using an external SVG drawing editor software.  Once finished, the entire SVG string can be injected into this node to display it in the dashboard.  The current SVG drawing will be completely removed and replaced by the new SVG drawing.
+   ```
+   "payload": {
+      "command": "set_svg",
+      "svg": "<circle id='my_circle' cx='250' cy='70' r='50' style='fill:red:'>"
+   }
+   ```
+
 + *Get*: It is also possible to get the SVG string from this node, send in an output message.  That SVG string will be the original injected SVG string, inclusive all manipulations executed via input messages.
+   ```
+   "payload": {
+      "command": "get_svg"
+   }
+   ```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/set%20and%20get%20svg.json):
 
@@ -60,6 +72,11 @@ See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/
 # Get delta
 
 Once a new SVG drawing is created (by adding a new SVG node to the flow or via the `set_svg` command), that drawing can be enhanced via input messages.  Which means there will be a delta between the initial SVG drawing and the current enhanced SVG drawing.  That delta can be fetched for informational purpose:
+```
+"payload": {
+    "command": "get_delta"
+}
+```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/get%20delta.json):
 
@@ -67,7 +84,13 @@ See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/
 
 # Update SVG
 
-When a new SVG drawing has been set and it has been enhanced afterwards via commands in input messages, then there will be a delta between the intial drawing and the current enhanced drawing.  In some use cases it is required to update that initial drawing, but that delta needs to be applied again.
+When a new SVG drawing has been set and it has been enhanced afterwards via commands in input messages, then there will be a delta between the intial drawing and the current enhanced drawing.  In some use cases it is required to update that initial drawing, but that delta needs to be applied again:
+```
+"payload": {
+   "command": "update_svg",
+   "svg": "<text id='my_text' x='50' y='160' style='font: italic 40px serif;'>Hello Node-RED!</text>"
+}
+```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/update%20svg.json):
 
@@ -84,9 +107,33 @@ Remarks:
    6. The updated floorplan will be displayed inclusive the sensor in red.
  + This will only work correctly if the id's of the SVG elements are not changed!
 
-# Creating and removing elements
+# Adding and removing elements
 
-New elements can be added dynamically to a drawing, and existing elements can be removed.  
++ *Add* new elements dynamically to a drawing:
+   ```
+   "payload": {
+      "command": "add_element",
+      "type": "ellipse",
+      "id": "my_ellipse",
+      "attributes": {
+         "cx": "150",
+         "cy": "80",
+         "rx": "80",
+         "ry": "30"
+      },
+      "style": {
+         "fill": "purple"
+      }
+   }
+   ```
+
++ *Remove* existing elements from a drawing:  
+   ```
+   "payload": {
+      "command": "remove_element",
+      "selector": "#my_ellipse"
+   }
+   ```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/creating%20and%20deleting%20elements.json):
 
@@ -94,7 +141,25 @@ See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/
 
 # Creating material design icons
 
-Dashboard D2 supports Material Design Icons (see [list](https://pictogrammers.com/library/mdi/) of icons), which are also very convenient inside an SVG drawing.
+Dashboard D2 supports Material Design Icons (see [list](https://pictogrammers.com/library/mdi/) of icons), which are very convenient inside an SVG drawing.  Those can be created by adding a simple text element:
+```
+"payload": {
+   "command": "add_element",
+   "id": "#my_icon",
+   "type": "text",
+   "attributes": {
+      "x": "150",
+      "y": "120",
+      "fill": "red"
+   },
+   "style": {
+      "font-family": "Material Design Icons",
+      "font-weight": "bold",
+      "font-size": "100px"
+   },
+   "text": "{{mdi-cctv}}"
+}
+```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/create%20material%20design%20icon.json):
 
@@ -104,9 +169,43 @@ See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/
 
 The attributes of an element can be manipulated via input messages:
 + *Set*: overwrite the value of an existing attribute, or create a new attribute if it doesn't exist yet.
+   ```
+   "payload": {
+      "command": "set_attribute",
+      "selector": "#my_path",
+      "attribute": "stroke",
+      "value": "red"
+   }
+   ```
+
 + *Get*: get the value of an attribute.
+   ```
+   "payload": {
+      "command": "get_attribute",
+      "selector": "#my_path",
+      "attribute": "d"
+   }
+   ```
+
 + *Remove*: remove an attribute from an element.
+   ```
+   "payload": {
+      "command": "remove_attribute",
+      "selector": "#my_path",
+      "attribute": "stroke-width"
+   }
+   ```
+
 + *Replace*: replace part of the value of an attribute, based on a regex match.  To be used in case it is too hard to compose the entire attribute value from scratch in a flow.
+   ```
+   "payload": {
+      "command": "replace_attribute",
+      "selector": "#my_path",
+      "attribute": "d",
+      "regex": "M[^ ]+ [^ ]+ Q [^ ]+ ([^ ]+), [^ ]+ [^ ]+ T [^ ]+ [^ ]+",
+      "value": "20"
+   }
+   ```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/set%20and%20get%20and%20remove%20attribute.json):
 
@@ -115,9 +214,38 @@ See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/
 # Add, get and remove style
 
 Elements can have a (CSS) style, which consists out of one or more style attributes.
-+ *Add*: overwrite the value of an existing attribute, or create a new style attribute if it doesn't exist yet. --> TODO should become set instead of add!
++ *Set*: the value of an existing stye attribute, or create a new style attribute if it doesn't exist yet. --> TODO should become set instead of add!
+   ```
+   "payload": {
+      "command": "set_style_attribute",
+      "selector": "#my_rectangle",
+      "attribute": "fill",
+      "value": "orange"
+   }
+   ```
+
++ *Set*: the the entire style, i.e. all available style attributes at once.
+   ```
+   "payload": {
+      "command": "set_style",
+      "selector": "#my_rectangle",
+      "style": {
+         "fill": "red",
+         "stroke": "blue"
+      }
+   }
+   ```
+
 + *Get*: get the value of a style attribute. --> TODO implement
+
 + *Remove*: remove a style attribute from an element.
+   ```
+   "payload": {
+      "command": "remove_style_attribute",
+      "selector": "#my_rectangle",
+      "attribute": "stroke"
+   }
+   ```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/add%20and%20get%20and%20remove%20style.json):
 
@@ -125,28 +253,63 @@ See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/
 
 # Set and get text content
 
-Among others, SVG text elements have a text content that can be get or set:
+Among others, SVG text elements have a text content that can be get or set.
+
++ *Set* text content of an SVG element:
+   ```
+   "payload": {
+      "command": "set_text",
+      "selector": "#my_text",
+      "text": "Text content updated"
+   }
+   ```
+
++ *Get" text content of an SVG element:
+   ```
+   "payload": {
+      "command": "get_text",
+      "selector": "#my_text"
+   }
+   ```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/set%20and%20get%20text%20content.json):
 
 ![svg_text](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/0f416126-6c26-4c93-bf71-93c25e747f1e)
 
-In the above example the text content of a `text` element (with id *"my_text"*) is set like this:
+Note that tools like (e.g. Inkscape) create SVG drawings with text elements that have a nested `tspan` element, which contain the text content.  You can set the text content of such a nested `tspan` element via the selector:
 ```
-"command": "set_text",
-"selector": "#my_text",
-"text": "Text content updated"
-```
-However tools like e.g. Inkscape create SVG drawings with text elements that have a nested `tspan` element, which contain the text content.  You can set the text content of such a nested `tspan` element via the selector:
-```
-"command": "set_text",
-"selector": "#my_text > tspan",
-"text": "Tspan content updated"
+"payload": {
+   "command": "set_text",
+   "selector": "#my_text > tspan",
+   "text": "Tspan content updated"
+}
 ```
 
 # Add and remove events
 
-Apply events (e.g. click) to elements, to trigger actions (e.g. send output message) when these events occur on those elements:
+Apply events (e.g. click) to elements, to trigger actions (e.g. send output message) when these events occur on those elements.
+
++ *Add* event to the specified SVG element(s).
+   ```
+   "payload": {
+      "command": "add_event",
+      "selector": "#my_circle",
+      "message": {
+         "topic": "click event triggered",
+         "payload": "circle clicked"
+      },
+      "event": "click"
+   }
+   ```
+
++ *Remove* event from the specified SVG element(s).
+   ```
+   "payload": {
+      "command": "remove_event",
+      "selector": "#my_circle",
+      "event": "click"
+   }
+   ```
 
 See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/add%20and%20remove%20event.json):
 
