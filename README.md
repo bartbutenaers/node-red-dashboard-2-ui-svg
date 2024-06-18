@@ -53,17 +53,23 @@ All the example flows below, will be available via the Node-RED *'Import'* menu.
 + *Set*: In most cases, users will create their drawing using an external SVG drawing editor software.  Once finished, the entire SVG string can be injected into this node to display it in the dashboard.  The current SVG drawing will be completely removed and replaced by the new SVG drawing.
 + *Get*: It is also possible to get the SVG string from this node, send in an output message.  That SVG string will be the original injected SVG string, inclusive all manipulations executed via input messages.
 
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/set%20and%20get%20svg.json):
+
 ![svg_set_get](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/e9007e13-4257-4a03-bc16-5c8445d9b16e)
 
 # Get delta
 
 Once a new SVG drawing is created (by adding a new SVG node to the flow or via the `set_svg` command), that drawing can be enhanced via input messages.  Which means there will be a delta between the initial SVG drawing and the current enhanced SVG drawing.  That delta can be fetched for informational purpose:
 
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/get%20delta.json):
+
 ![svg_get_delta](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/e95382e6-2454-4003-b5df-a06d338236bd)
 
 # Update SVG
 
 When a new SVG drawing has been set and it has been enhanced afterwards via commands in input messages, then there will be a delta between the intial drawing and the current enhanced drawing.  In some use cases it is required to update that initial drawing, but that delta needs to be applied again.
+
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/update%20svg.json):
 
 ![svg_update](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/1b0414b4-696c-4395-9904-61a2a9552058)
 
@@ -82,11 +88,15 @@ Remarks:
 
 New elements can be added dynamically to a drawing, and existing elements can be removed.  
 
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/creating%20and%20deleting%20elements.json):
+
 ![svg_add_remove](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/cf60c069-ec7b-4000-8275-e245d362489e)
 
 # Creating material design icons
 
 Dashboard D2 supports Material Design Icons (see [list](https://pictogrammers.com/library/mdi/) of icons), which are also very convenient inside an SVG drawing.
+
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/create%20material%20design%20icon.json):
 
 ![svg_mdi_icon](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/a6713663-78c9-46a9-93c6-1ae3efeb6de6)
 
@@ -98,6 +108,8 @@ The attributes of an element can be manipulated via input messages:
 + *Remove*: remove an attribute from an element.
 + *Replace*: replace part of the value of an attribute, based on a regex match.  To be used in case it is too hard to compose the entire attribute value from scratch in a flow.
 
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/set%20and%20get%20and%20remove%20attribute.json):
+
 ![svg_attribute](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/ccde828a-3f8a-49c9-9a8a-095ed78aeb46)
 
 # Add, get and remove style
@@ -107,11 +119,15 @@ Elements can have a (CSS) style, which consists out of one or more style attribu
 + *Get*: get the value of a style attribute. --> TODO implement
 + *Remove*: remove a style attribute from an element.
 
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/add%20and%20get%20and%20remove%20style.json):
+
 ![svg_style](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/7fc17fee-4e37-4f81-ba86-1456a18fb484)
 
 # Set and get text content
 
 Among others, SVG text elements have a text content that can be get or set:
+
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/set%20and%20get%20text%20content.json):
 
 ![svg_text](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/0f416126-6c26-4c93-bf71-93c25e747f1e)
 
@@ -131,5 +147,7 @@ However tools like e.g. Inkscape create SVG drawings with text elements that hav
 # Add and remove events
 
 Apply events (e.g. click) to elements, to trigger actions (e.g. send output message) when these events occur on those elements:
+
+See [example flow](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/blob/master/examples/add%20and%20remove%20event.json):
 
 ![svg_events](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/assets/14224149/d88ae48c-d260-409d-ae38-f00d642564fe)
