@@ -54,7 +54,7 @@ export default {
             })
         })
 
-        // The width and height of the svg are set to 100%, to make sure the svg fills the available space in the 
+        // The width and height of the svg are set to 100%, to make sure the svg fills the available space in the
         // parent container.  However the viewbox dimensions are in px (not %), so when the parent container
         // resizes, the viewbox need to be resized also.
         // TODO we should keep the original width and height in px and the original viewbox, and adjust the
@@ -107,7 +107,7 @@ debugger
                                 return mdiIcon(iconName)
                             })
                         }
-                        svgUtils.addElement(document, svgElement, payloadItem)
+                        svgUtils.addElement(document, svgElement, props.props.animations, props.props.events,  payloadItem)
                         break
                     case 'add_event':
                         svgUtils.addEvent(svgElement, payloadItem, this.handleEvent)
@@ -129,15 +129,14 @@ debugger
                         let domParser = new DOMParser()
 
                         // When parsing the svg string, a new document is created (not related to the current document of this page)
-                        let newDocument = svgUtils.setSvg(domParser, payloadItem)
-
+                        let newDocument = svgUtils.setSvg(domParser, props.props.events, props.props.animations, payloadItem, this.handleEvent)
                         let newSvgElement = newDocument.querySelector('svg')
 
                         // Import the new svg node into the current document
                         let importedNode = document.importNode(newSvgElement, true)
 
                         // We cannot simply replace the old svg element node by the new one, because VueJs keeps a reference
-                        // to the old element.  Therefore copy all relevant attributes from the new element to the old one. 
+                        // to the old element.  Therefore copy all relevant attributes from the new element to the old one.
                         svgElement.removeAttribute('viewBox')
                         let newViewBox = newSvgElement.getAttribute('viewBox')
                         if (newViewBox) {
