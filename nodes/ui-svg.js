@@ -114,7 +114,7 @@ module.exports = function (RED) {
                     for (let payloadItem of msg.payload) {
                         let elements, values, valid
 
-                        // Some commands result in an output msg being send.  These msg will be send independent whether 
+                        // Some commands result in an output msg being send.  These msg will be send independent whether
                         // other commands fail or not, because these 'get_xxx' commands don't enhance the virtual DOM
                         // (during the transaction) anyway.  But instead from starting a command from scratch, it is
                         // better to override the payload of the original input msg.  But since an input msg can contain
@@ -123,7 +123,7 @@ module.exports = function (RED) {
 
                         // Some commands can update the last received svg string.
                         // Note that if an input msg contains multiple commands to change the last received svg string,
-                        // then only the last of those svg strings will be stored.  
+                        // then only the last of those svg strings will be stored.
                         let lastReceivedSvgString
 
                         if (!payloadItem.command) {
@@ -135,7 +135,7 @@ module.exports = function (RED) {
                         switch(payloadItem.command) {
                             case 'add_element': // Add elements or replace existing elements
                                 checkRequiredFields(payloadItem, ['type'])
-                                svgUtils.addElement(node.enhancedDocument, svgElement, payloadItem)
+                                svgUtils.addElement(node.enhancedDocument, svgElement, config.animations, config.events, payloadItem)
                                 break
                             case 'add_event':
                                 // TODO: if js events are imported, we could introduce a 'javascript' property which contains
@@ -268,7 +268,7 @@ module.exports = function (RED) {
                                 }
 
                                 // Replace the old document (containing the old svg) by the new one in the virtual DOM
-                                node.enhancedDocument = svgUtils.setSvg(node.domParser, payloadItem)
+                                node.enhancedDocument = svgUtils.setSvg(node.domParser, config.events, config.animations, payloadItem, callbackHandler)
 
                                 // Temporarily store the newly received svg (without the delta applied)
                                 lastReceivedSvgString = payloadItem.svg
@@ -390,7 +390,7 @@ module.exports = function (RED) {
                     }
                     node.enhancedDocument = svgUtils.setSvg(node.domParser, restorePayloadItem)
 
-                    // Make sure the message is not processed by the frontend 
+                    // Make sure the message is not processed by the frontend
                     // TODO check whether it can be stopped from being sended to the frontend
                     msg = {}
                 }
