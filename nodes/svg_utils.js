@@ -15,6 +15,24 @@ let clickCount
 // INTERNAL (HELPER) FUNCTIONS
 // ===================================================================================================
 
+function _addEvent(element, selector, event, message) {
+    let dataAttribute = `data-event_${payload.event}`
+
+    if (!element.hasAttribute(dataAttribute)) {
+        element.addEventListener(payload.event, callbackHandler, false)
+
+        // Store all the user data in a "data-event_<event>" element attribute, to have it available in the handleEvent function
+        element.setAttribute(dataAttribute, JSON.stringify({
+            elementId  : element.id,
+            selector   : selector,
+            event      : event,
+            message    : message
+        }))
+
+        element.style.cursor = "pointer"
+    }
+}
+
 // Determine - based on the attribute name - whether a namespaced value should be set or not.
 // See https://stackoverflow.com/questions/52571125/setattributens-xmlns-of-svg-for-a-general-purpose-library
 function _setAttribute(element, name, value) {
@@ -74,7 +92,7 @@ function _setText(element, text) {
 // ===================================================================================================
 
 // Add elements, or replace them if they already exist
-function addElement(document, svgElement, payload) {
+function addElement(document, svgElement, animations, events, payload) {
     let parentElements = []
     if (payload.parentSelector) {
         parentElements = svgElement.querySelectorAll(payload.parentSelector);
@@ -115,6 +133,7 @@ function addElement(document, svgElement, payload) {
             newElement = document.createElementNS('http://www.w3.org/2000/svg', payload.type)
         }
 
+// TODO not possible to apply the same  id to multiple elements
         if (payload.id) {
             _setAttribute(newElement, 'id', payload.id)
         }
@@ -152,28 +171,19 @@ function addElement(document, svgElement, payload) {
     })
 }
 
+
+// TODO eigenlijk moeten we alle events (en animations) ook toepassen als we addelement doen, want die kunnen van
+// toepassing zijn op dat nieuwe element (via de selector).
+// Maar ook de events die via addEvent geadded zijn geweest.  Die moeten we dus ook ergens bijhouden.
+// We moeten dus ook een addAnimation maken, en dan die in een lijst bijhouden.  Dus niet via addElement werken.
 function addEvent(svgElement, payload, callbackHandler) {
     let elements = svgElement.querySelectorAll(payload.selector)
     if (!elements || !elements.length) {
         throw new Error(`No svg elements found for the specified 'selector' (${payload.selector})`)
     }
 
-    let dataAttribute = `data-event_${payload.event}`
-
     elements.forEach(function(element) {
-        if (!element.hasAttribute(dataAttribute)) {
-            element.addEventListener(payload.event, callbackHandler, false)
-
-            // Store all the user data in a "data-event_<event>" element attribute, to have it available in the handleEvent function
-            element.setAttribute(dataAttribute, JSON.stringify({
-                elementId  : element.id,
-                selector   : payload.selector,
-                event      : payload.event,
-                message    : payload.message
-            }))
-
-            element.style.cursor = "pointer"
-        }
+        _addEvent(element, payload.selector, payload.event, payload.message)
     })
 }
 
@@ -250,7 +260,7 @@ function setStyle(svgElement, payload) {
     })
 }
 
-function setSvg(domParser, payload) {
+function setSvg(domParser, events, animations, payload, callbackHandler) {
     // Make sure there is an svg root element, because the dom parser below won't add it automatically
     if (!payload.svg.trim().startsWith('<svg')) {
         payload.svg = `<svg>${payload.svg}</svg>`
@@ -282,6 +292,44 @@ function setSvg(domParser, payload) {
     // Otherwise users end up with a lot of troubles, so let's keep it simple...
     _setAttribute(svgElement, 'width', '100%')
     _setAttribute(svgElement, 'heigth', '100%')
+
+
+    events.forEach((eventItem) => {
+/*
+TODO de voorbeeld flow aanpassen over de items: message ipv payload en topic
+*/
+        _addEvent(element, eventItem.selector, eventItem.event, payload.message)
+    })
+
+    // Apply the animations from the config screen to the SVG elements, by adding <animation> elements.
+    // Set "begin" to "indefinite" when a message needs to trigger the animation
+    animations.forEach((animation) => {
+        let element = svgElement.querySelector("#" + animation.targetId)
+
+        if (!element) {
+            throw new Error(`No svg elements found for the specified 'targetId' (${animation.targetId})`)
+        }
+
+        let animationElement = document.createElementNS("http://www.w3.org/2000/svg", animationItem.type)
+
+        let attributes = animationItem.attributes || {}
+
+        const supportedAnimationAttributes = ["attributeName", "from", "to", "dur", "repeatCount", "begin", "end", "min", "max", "repeatDur", "restart", "fill", "calcMode", "values", "keyTimes", "keySplines", "from", "to", "by", "additive", "accumulate"];
+
+        Object.keys(attributes).forEach((attribute) => {
+            if (!supportedAnimationAttributes.includes(attribute)) {
+                throw new Error(`Unsupported animation attribute name '${key}'`)
+            }
+        })
+
+        Object.entries(attributes).forEach(([key, value]) => {
+            animationElement.setAttribute("id", animation.id)
+        })
+
+        // By appending the animation as a child of the SVG element, that parent SVG element will be animated.
+        // So there is no need to specify explicit the xlink:href attribute on the animation element.
+        element.appendChild(animationElement)
+    })
 
     return document
 }
