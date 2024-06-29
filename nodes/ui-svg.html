@@ -17,22 +17,260 @@
                 }
             },
             height: { value: 0 },
-            order: { value: 0 }
+            order: { value: 0 },
+            events: { value: [] },
+            eventsUsage: { value: 'always' },
+            animations: { value: [] },
+            animationsUsage: { value: 'always' }
         },
         inputs: 1,
         outputs: 1,
-        icon: "font-awesome/fa-picture-o",
+        icon: 'font-awesome/fa-picture-o',
         label: function() {
-            return this.name || "svg";
+            return this.name || 'svg'
         },
         oneditprepare: function () {
+            let node = this
+
             $('#node-input-size').elementSizer({
                 width: '#node-input-width',
                 height: '#node-input-height',
                 group: '#node-input-group'
-            });
+            })
+debugger
+            // -----------------------------------------------------------------------------------
+            // TABSHEETS
+            // -----------------------------------------------------------------------------------
+
+            node.tabs = RED.tabs.create({
+                id: 'node-svg-tabsheets',
+                onchange: function(tab) {
+                    //console.log("tabs.onchange",tab)
+                    // Show only the content (i.e. the children) of the selected tabsheet, and hide the others
+                    $('.node-svg-tabsheet-content').hide()
+                    $('#' + tab.id).show()
+                }
+            })
+            node.tabs.addTab({
+                id: 'node-svg-tabsheet-general',
+                label: 'General'
+            })
+            node.tabs.addTab({
+                id: 'node-svg-tabsheet-events',
+                label: 'Events'
+            })
+            node.tabs.addTab({
+                id: 'node-svg-tabsheet-animations',
+                label: 'Animations'
+            })
+
+            // -----------------------------------------------------------------------------------
+            // TABSHEET EVENTS
+            // -----------------------------------------------------------------------------------
+
+            // https://www.w3.org/TR/2015/WD-SVG2-20150407/interact.html#SVGEvents
+            // https://www.w3.org/TR/touch-events/#list-of-touchevent-types
+            const SUPPORTED_EVENTS = {
+                'click':       'Click',
+                'dblclick':    'Double click',
+                'contextmenu': 'Context menu',
+                'mousedown':   'Mouse down',
+                'mouseup':     'Mouse up',
+                'mouseover':   'Mouse over',
+                'mouseout':    'Mouse out',
+                'focus':       'Focus',
+                'focusin':     'Focus in',
+                'focusout':    'Focus out',
+                'blur':        'Blur',
+                'keydown':     'Key down',
+                'keyup':       'Key up',
+                'touchstart':  'Touch start',
+                'touchend':    'Touch end',
+                'change':      'Change'
+            }
+
+            const default_message = {
+                payload: null,
+                topic: null
+            }
+
+            let eventsList = $('#node-input-events-container').css('min-height','150px')
+                                                              .css('min-width','450px')
+                                                              .editableList({
+                header: $('<div>').css('margin-left','28px')
+                                  .css('margin-right','28px')
+                                  .css('padding-right','0px')
+                                  .append($.parseHTML("<div style='width:23%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Selector</b></div>" +
+                                                      "<div style='width:23%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Event</b></div>" +
+                                                      "<div style='width:46%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Message</b></div>")),
+                addItem: function(container, i, eventItem) {
+                    let row = $('<div/>').appendTo(container)
+
+                    // Column 1
+                    let selectorField = $('<input/>').addClass('node-input-events-selector')
+                                                     .attr('type','text')
+                                                     .attr('placeholder','CSS selector')
+                                                     .css('width','23%')
+                                                     .css('margin-left','5px')
+                                                     .css('margin-right','5px')
+                                                     .appendTo(row)
+                    selectorField.val(eventItem.selector)
+
+                    // Column 2
+                    let eventField = $('<select/>').addClass('node-input-events-event')
+                                                   .attr('type','text')
+                                                   .attr('placeholder','click')
+                                                   .css('width','23%')
+                                                   .css('margin-left','5px')
+                                                   .css('margin-right','5px')
+                                                   .appendTo(row)
+                    for(let event in SUPPORTED_EVENTS) {
+                        $('<option />', {value: event, text: SUPPORTED_EVENTS[event]}).appendTo(eventField)
+                    }
+                    eventField.val(eventItem.event || "click")
+
+                    // Column 3
+                    let messageField = $('<input/>').addClass('node-input-events-message')
+                                                    .attr('type','text')
+                                                    .attr('placeholder','topic')
+                                                    .css('width','46%')
+                                                    .css('margin-left','5px')
+                                                    .css('margin-right','5px')
+                                                    .appendTo(row)
+                    messageField.typedInput({
+                        types: ['json']
+                    })
+                    messageField.typedInput('type', 'json')
+                    messageField.typedInput('value', eventItem.message || JSON.stringify(default_message))
+                },
+                removable: true,
+                sortable: true
+            })
+
+            if (this.events) {
+                this.events.forEach(function (eventItem, index) {
+                    eventsList.editableList('addItem', eventItem)
+                })
+            }
+
+            // -----------------------------------------------------------------------------------
+            // TABSHEET ANIMATIONS
+            // -----------------------------------------------------------------------------------
+
+            const ANIMATION_TYPES = {
+                'animate':          'Attribute',
+                'animateTransform': 'Transform',
+                'animateMotion':    'Motion'
+            }
+
+            const default_attributes = {
+                from: null,
+                to: null,
+                duration: null,
+                repeatCount: null,
+                begin: null,
+                end: null
+            }
+
+            let animationsList = $('#node-input-animations-container').css('min-height','150px')
+                                                                      .css('min-width','450px')
+                                                                      .editableList({
+                header: $('<div>').css('margin-left','28px')
+                                  .css('margin-right','28px')
+                                  .css('padding-right','0px')
+                                  .append($.parseHTML("<div style='width:23%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Animation id</b></div>" +
+                                                      "<div style='width:23%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Target id</b></div>" +
+                                                      "<div style='width:23%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Type</b></div>" +
+                                                      "<div style='width:23%; margin-left:5px; margin-right:5px; display: inline-grid'><b>Attributes</b></div>")),
+                addItem: function(container, i, animationItem) {
+                    let row = $('<div/>').appendTo(container)
+
+                    // Column 1
+                    let idField = $('<input/>').addClass('node-input-animations-id')
+                                               .attr('type','text')
+                                               .attr('placeholder','animation id')
+                                               .css('width','23%')
+                                               .css('margin-left','5px')
+                                               .css('margin-right','5px')
+                                               .appendTo(row)
+                    idField.val(animationItem.id)
+
+                    // Column 2
+                    let targetIdField = $('<input/>').addClass('node-input-animations-targetId')
+                                                     .attr('type','text')
+                                                     .attr('placeholder','CSS selector')
+                                                     .css('width','23%')
+                                                     .css('margin-left','5px')
+                                                     .css('margin-right','5px')
+                                                     .appendTo(row)
+                    targetIdField.val(animationItem.targetId)
+
+                    // Column 3
+                    let typeField = $('<select/>').addClass('node-input-animations-type')
+                                                  .attr('type','text')
+                                                  .attr('placeholder','click')
+                                                  .css('width','23%')
+                                                  .css('margin-left','5px')
+                                                  .css('margin-right','5px')
+                                                  .appendTo(row)
+                    for(let animationType in ANIMATION_TYPES) {
+                        $('<option />', {value: animationType, text: ANIMATION_TYPES[animationType]}).appendTo(typeField)
+                    }
+                    typeField.val(animationItem.type || "animate")
+
+                    // Column 4
+                    let attributesField = $('<input/>').addClass('node-input-animations-attributes')
+                                                       .attr('type','text')
+                                                       .attr('placeholder','payload')
+                                                       .css('width','23%')
+                                                       .css('margin-left','5px')
+                                                       .css('margin-right','5px')
+                                                       .appendTo(row)
+                    attributesField.typedInput({
+                        types: ['json']
+                    })
+                    attributesField.typedInput('type', 'json')
+                    attributesField.typedInput('value', animationItem.attributes || JSON.stringify(default_attributes))
+                },
+                removable: true,
+                sortable: true
+            })
+
+            if (this.animations) {
+                this.animations.forEach(function (animationItem, index) {
+                    animationsList.editableList('addItem', animationItem)
+                })
+            }
+        },
+        oneditsave: function() {
+            let node = this
+
+            node.events = []
+            let eventsList = $('#node-input-events-container').editableList('items')
+            eventsList.each(function(i) {
+                let eventItem = $(this)
+
+                node.events.push({
+                    selector:    eventItem.find('.node-input-events-selector').val(),
+                    event:       eventItem.find('.node-input-events-event').val(),
+                    message:     eventItem.find('.node-input-events-message').val()
+                })
+            })
+
+            node.animations = []
+            let animationsList = $('#node-input-animations-container').editableList('items')
+            animationsList.each(function(i) {
+                let animationItem = $(this)
+
+                node.animations.push({
+                    id:          animationItem.find('.node-input-animations-id').val(),
+                    targetId:    animationItem.find('.node-input-animations-targetId').val(),
+                    type:        animationItem.find('.node-input-animations-type').val(),
+                    attributes:  animationItem.find('.node-input-animations-attributes').val(),
+                })
+            })
         }
-    });
+    })
 </script>
 
 <script type="text/html" data-template-name="ui-svg">
@@ -49,5 +287,42 @@
         <input type="hidden" id="node-input-width">
         <input type="hidden" id="node-input-height">
         <button class="editor-button" id="node-input-size"></button>
+    </div>
+    <div class="form-row">
+        <!-- Tabsheets -->
+        <ul style="background: #fff; min-width: 600px; margin-bottom: 20px;" id="node-svg-tabsheets"></ul>
+    </div>
+    <div style="min-height: 150px">
+        <!-- General tabsheet -->
+        <div id="node-svg-tabsheet-general" class="node-svg-tabsheet-content">
+        </div>
+        <!-- Events tabsheet -->
+        <div id="node-svg-tabsheet-events" class="node-svg-tabsheet-content">
+            <div class="form-row">
+                <label for="node-input-eventsUsage"><i class="fa fa-filter"></i> Usage</label>
+                <select id="node-input-eventsUsage">
+                    <option value="none">None</option>
+                    <option value="always">Always when svg set</option>
+                </select>
+            </div>
+            <div class="form-row form-row-auto-height">
+                <!-- Table with events -->
+                <ol id="node-input-events-container"></ol>
+            </div>
+        </div>
+        <!-- Animations tabsheet -->
+        <div id="node-svg-tabsheet-animations" class="node-svg-tabsheet-content">
+            <div class="form-row">
+                <label for="node-input-animationsUsage"><i class="fa fa-filter"></i> Usage</label>
+                <select id="node-input-animationsUsage">
+                    <option value="none">None</option>
+                    <option value="always">Always when svg set</option>
+                </select>
+            </div>
+            <div class="form-row form-row-auto-height">
+                <!-- Table with animations -->
+                <ol id="node-input-animations-container"></ol>
+            </div>
+        </div>
     </div>
 </script>
