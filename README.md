@@ -20,25 +20,14 @@ Please buy my wife a coffee to keep her happy, while I am busy developing Node-R
 
 ## Status of this project
 
-This repository contains an early alpha version.  It still lacks MANY features from the [old svg node](https://github.com/bartbutenaers/node-red-contrib-ui-svg/blob/master/README.md), which I had developed at the time being for the old AngularJs Node-RED dashboard (which is end of life).
-
-This new node won't look in any way to the old svg node.  I understand that people would like to have a simple replacement for their old svg node inside the new dashboard D2.  But that won't be the case for many reasons:
-
-1. Severe lack of free time.  Remember that I am not a software company...
-2. VueJs (combined with Vite builds) is a complete different technology compared to AngularJs.
-3. Lots of features have sneaked in the old ui node, which I regretted afterwards that I have agreed to implement.  They didn't fit into the overal design, and gave me a lot of maintainance issues afterwards.
-4. The old svg node has grown organically over the years to become a little monster.  Some parts should be separated into separate nodes, like e.g. the ability to open the svg in a drawing editor.
-5. Replacement of the DrawSvg editor by another one offers layers, for example SVG-Edit.
-6.  In the old nodes there were a lot of issues from users that tried to implement workarounds for the lack of a server-side state.  But all these implementations had their own disadvantages.  Hopefully I can solve this kind of troubles by keeping a server-side virtual DOM tree in sync with the DOM trees in the browsers.
-7.  Server-side management of animations, to avoid that new clients don't receive active animations.
-8.  Cleanup of input/output message formats, to make things (hopefully) easier to get started with.
+This repository contains an early alpha version.  It still lacks MANY features from the [old svg node](https://github.com/bartbutenaers/node-red-contrib-ui-svg/blob/master/README.md), which I had developed at the time being for the old AngularJs Node-RED dashboard (which is end of life).  This node also will be completely different from the old node (see [here](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/issues/11) why).
 
 Some remarks:
 + Most of these features still needs to be implemented, so there is ***no*** point yet to start registering issues.
 + Due to the lack of free time, there is also ***no*** roadmap or ETA.
 + Take into account that at this moment there will be most probably breaking changes, and ***no*** backwards compatibility will be provided!
 
-Of course contributions are very welcome!  Just make sure to discuss it in advance (by opening an issue), because - as explained above - the new node will ***not*** be a modern lookalike of the old node.  
+:warning: For more info about why this node is currently not actively maintained, see [here](https://github.com/bartbutenaers/node-red-dashboard-2-ui-svg/issues/12).
 
 ## Node usage
 
